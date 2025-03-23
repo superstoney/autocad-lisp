@@ -1,0 +1,359 @@
+{
+  "ShortcutKey": "XX",
+  "SelectedOption": "否",
+  "SelectedColor": "白月光",
+  "SliderValue": 69,
+  "SelectedColorBrush": "#FF80C080",
+  "ButtonSpacing_leftright": 2.0,
+  "ButtonSpacingTopBottom": 5.0,
+  "ButtonMaxWidth": 100.0,
+  "SelectedFontColor": "#FF000000",
+  "SFontColor": "黑色",
+  "SelectedFilePath": "D:\\OneDrive - tju.edu.cn\\ProgramData\\autocad\\04 LISP程序\\GJX-V4.0\\Excel\\工具箱.xlsx",
+  "FileNameWithoutExtension": "工具箱",
+  "FileItems": [
+    {
+      "ExcelName": "工具箱",
+      "ExcelPath": "D:\\OneDrive - tju.edu.cn\\ProgramData\\autocad\\04 LISP程序\\GJX-V4.0\\Excel\\工具箱.xlsx"
+    }
+  ],
+  "SheetNames": [
+    "常用功能",
+    "网站 "
+  ],
+  "SelectedSheetName": "常用功能",
+  "CellData": [
+    [
+      {
+        "Value": "文字功能",
+        "Color": null,
+        "TextColor": null,
+        "Hyperlink": null
+      },
+      {
+        "Value": "块功能",
+        "Color": null,
+        "TextColor": null,
+        "Hyperlink": null
+      },
+      {
+        "Value": "图层功能",
+        "Color": "#00B050",
+        "TextColor": null,
+        "Hyperlink": null
+      },
+      {
+        "Value": "复制移动",
+        "Color": null,
+        "TextColor": null,
+        "Hyperlink": null
+      },
+      {
+        "Value": "颜色功能",
+        "Color": null,
+        "TextColor": "#FF0000",
+        "Hyperlink": null
+      }
+    ],
+    [
+      {
+        "Value": "文字刷|FA",
+        "Color": null,
+        "TextColor": "#0000FF",
+        "Hyperlink": "文字刷.bmp"
+      },
+      {
+        "Value": "快速建块|ksjk",
+        "Color": null,
+        "TextColor": null,
+        "Hyperlink": "快速建块.bmp"
+      },
+      {
+        "Value": "更改图层|ADDLAYER",
+        "Color": null,
+        "TextColor": null,
+        "Hyperlink": "更改图层.bmp"
+      },
+      {
+        "Value": "超级复制|CCYJC",
+        "Color": null,
+        "TextColor": "#0000FF",
+        "Hyperlink": "复制.png"
+      },
+      {
+        "Value": "颜色刷|ColorBrush",
+        "Color": "#FFFFFF",
+        "TextColor": "#0000FF",
+        "Hyperlink": "颜色刷.bmp"
+      }
+    ],
+    [
+      {
+        "Value": "数字递增|DZ",
+        "Color": null,
+        "TextColor": "#0000FF",
+        "Hyperlink": "数字递增.bmp"
+      },
+      {
+        "Value": "在位编辑|bjkuai",
+        "Color": null,
+        "TextColor": null,
+        "Hyperlink": "在位编辑.bmp"
+      },
+      {
+        "Value": "图层刷|LayerBrush",
+        "Color": null,
+        "TextColor": "#0000FF",
+        "Hyperlink": "图层刷.png"
+      },
+      {
+        "Value": "超级移动|MMYJC",
+        "Color": null,
+        "TextColor": "#0000FF",
+        "Hyperlink": "移动.png"
+      },
+      {
+        "Value": "改8号色|ChangeToColor8",
+        "Color": null,
+        "TextColor": "#0000FF",
+        "Hyperlink": "8号色.bmp"
+      }
+    ],
+    [
+      {
+        "Value": "字段工具|zdgj",
+        "Color": null,
+        "TextColor": "#0000FF",
+        "Hyperlink": "字段工具.bmp"
+      },
+      {
+        "Value": "块在位保存|bckuai",
+        "Color": null,
+        "TextColor": null,
+        "Hyperlink": "在位保存.bmp"
+      },
+      {
+        "Value": "保留选择图层|CloseOthers",
+        "Color": null,
+        "TextColor": "#0000FF",
+        "Hyperlink": "保留选择图层.png"
+      },
+      {
+        "Value": "联动",
+        "Color": "#FFFF00",
+        "TextColor": null,
+        "Hyperlink": null
+      },
+      {
+        "Value": "颜色随层|ColorByLayer",
+        "Color": null,
+        "TextColor": "#0000FF",
+        "Hyperlink": "颜色随层.bmp"
+      },
+      {
+        "Value": "",
+        "Color": "#FFFFFF",
+        "TextColor": null,
+        "Hyperlink": null
+      }
+    ],
+    [
+      {
+        "Value": "字体替换|ZTTH",
+        "Color": null,
+        "TextColor": "#0000FF",
+        "Hyperlink": "字体替换.bmp"
+      },
+      {
+        "Value": "放弃保存|fqkuai",
+        "Color": null,
+        "TextColor": null,
+        "Hyperlink": "放弃保存.bmp"
+      },
+      {
+        "Value": "功能",
+        "Color": null,
+        "TextColor": null,
+        "Hyperlink": null
+      },
+      {
+        "Value": "删除标记|RemoveDict",
+        "Color": "#FFFF00",
+        "TextColor": "#0000FF",
+        "Hyperlink": "删除标记.BMP"
+      },
+      {
+        "Value": "文件管理",
+        "Color": "#F43308",
+        "TextColor": null,
+        "Hyperlink": null
+      },
+      {
+        "Value": "",
+        "Color": "#FFFFFF",
+        "TextColor": null,
+        "Hyperlink": null
+      }
+    ],
+    [
+      {
+        "Value": "数字排序|PLSZ",
+        "Color": null,
+        "TextColor": "#0000FF",
+        "Hyperlink": "数字排列.bmp"
+      },
+      {
+        "Value": "添加到块|addd",
+        "Color": null,
+        "TextColor": null,
+        "Hyperlink": "添加到块.bmp"
+      },
+      {
+        "Value": "面积统计|CalculateArea",
+        "Color": null,
+        "TextColor": "#800080",
+        "Hyperlink": "面积统计.bmp"
+      },
+      {
+        "Value": "添加不同标记|AddDict",
+        "Color": "#FFFF00",
+        "TextColor": "#0000FF",
+        "Hyperlink": "添加不同标记.png"
+      },
+      {
+        "Value": "图库管理|tkyjc",
+        "Color": "#F43308",
+        "TextColor": "#0000FF",
+        "Hyperlink": "图库管理.bmp"
+      },
+      {
+        "Value": null,
+        "Color": null,
+        "TextColor": null,
+        "Hyperlink": null
+      },
+      {
+        "Value": "",
+        "Color": "#FFFFFF",
+        "TextColor": null,
+        "Hyperlink": null
+      }
+    ],
+    [
+      {
+        "Value": null,
+        "Color": null,
+        "TextColor": null,
+        "Hyperlink": null
+      },
+      {
+        "Value": "块中删除|eddd",
+        "Color": null,
+        "TextColor": null,
+        "Hyperlink": "块中删除.bmp"
+      },
+      {
+        "Value": "添加表格|CreateTable",
+        "Color": null,
+        "TextColor": "#0000FF",
+        "Hyperlink": "添加表格.bmp"
+      },
+      {
+        "Value": "添加统一标记|SetDict",
+        "Color": "#FFFF00",
+        "TextColor": "#0000FF",
+        "Hyperlink": "添加统一标记%20.png"
+      },
+      {
+        "Value": "图->文件夹|OpenFolder",
+        "Color": "#F43308",
+        "TextColor": "#0000FF",
+        "Hyperlink": "图到文件夹.bmp"
+      }
+    ],
+    [
+      {
+        "Value": null,
+        "Color": null,
+        "TextColor": null,
+        "Hyperlink": null
+      },
+      {
+        "Value": null,
+        "Color": null,
+        "TextColor": null,
+        "Hyperlink": null
+      },
+      {
+        "Value": "引出标注|ADDML",
+        "Color": null,
+        "TextColor": "#0000FF",
+        "Hyperlink": "引出标注.bmp"
+      },
+      {
+        "Value": "联动移动|MoveDICT",
+        "Color": "#FFFF00",
+        "TextColor": "#0000FF",
+        "Hyperlink": "联动移动.png"
+      },
+      {
+        "Value": "选择易|SS",
+        "Color": "#F43308",
+        "TextColor": "#0000FF",
+        "Hyperlink": "选择易.BMP"
+      }
+    ],
+    [
+      {
+        "Value": null,
+        "Color": null,
+        "TextColor": null,
+        "Hyperlink": null
+      },
+      {
+        "Value": null,
+        "Color": null,
+        "TextColor": null,
+        "Hyperlink": null
+      },
+      {
+        "Value": "",
+        "Color": "#FFFFFF",
+        "TextColor": null,
+        "Hyperlink": null
+      },
+      {
+        "Value": "联动改字|ModifyDICT",
+        "Color": "#FFFF00",
+        "TextColor": "#0000FF",
+        "Hyperlink": "联动改字.bmp"
+      }
+    ],
+    [
+      {
+        "Value": null,
+        "Color": null,
+        "TextColor": null,
+        "Hyperlink": null
+      },
+      {
+        "Value": null,
+        "Color": null,
+        "TextColor": null,
+        "Hyperlink": null
+      },
+      {
+        "Value": null,
+        "Color": null,
+        "TextColor": null,
+        "Hyperlink": null
+      },
+      {
+        "Value": "查询标记|GetDictHighlight",
+        "Color": "#FFFF00",
+        "TextColor": "#0000FF",
+        "Hyperlink": "查询标记.BMP"
+      }
+    ]
+  ]
+}

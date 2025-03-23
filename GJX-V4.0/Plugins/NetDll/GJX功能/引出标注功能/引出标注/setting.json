@@ -1,0 +1,32 @@
+{
+  "isUpOptions": true,
+  "ConfirmCommand": {},
+  "UPTextGuanLiCommand": {},
+  "DownTextGuanLiCommand": {},
+  "CurrentTextOptions": [
+    "ABCDE"
+  ],
+  "UpTextOptions": [
+    "测试A",
+    "2",
+    "ABCDE"
+  ],
+  "DownTextOptions": [
+    "测试B",
+    "3",
+    "XYZ"
+  ],
+  "UpTextFilteredOptions": [
+    "测试A"
+  ],
+  "DownTextFilteredOptions": [
+    "测试B"
+  ],
+  "SelectedOption": null,
+  "BaselineLength": "60.0",
+  "UpTextIsDropDownOpen": false,
+  "UpText": "测试A",
+  "DownTextIsDropDownOpen": false,
+  "DownText": "测试B",
+  "TextHeight": "120"
+}
