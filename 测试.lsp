@@ -1,148 +1,87 @@
-;;;; 多段线高程赋值程序
+;;;; AutoCAD 面积计算与复制程序
 ;;;; 作者: superstoney
-;;;; 日期: 2025-03-22
+;;;; 日期: 2024-01-09
+;;;; 功能说明: 计算选定对象的面积并自动复制到剪贴板
+;;;; 支持对象: 圆形、椭圆、直线、多段线、样条曲线、圆弧、填充图案
 
-(defun c:SET_ELEV (/ pt1 pt2 h b lines int_pts)
-  (vl-load-com)
-  (setq h (getreal "\n请输入起始高程: "))
-  (setq b (getreal "\n请输入增量高程: "))
-  (setq pt1 (getpoint "\n请选择起点: "))     
-  (setq pt2 (getpoint pt1 "\n请选择终点: ")) 
+;; 将文本复制到系统剪贴板的函数
+(defun SET-CLIP-STRING (STR / HTML RESULT)
+    ;; 检查输入是否为字符串，并执行剪贴板操作
+    (and (= (type STR) 'STR)
+         (vl-catch-all-apply
+           '(lambda ()
+              ;; 创建 HTML 文件对象用于访问剪贴板
+              (setq HTML (vlax-create-object "htmlfile"))
+              ;; 设置剪贴板内容
+              (setq RESULT (vlax-invoke
+                            (vlax-get (vlax-get HTML 'PARENTWINDOW)
+                                    'CLIPBOARDDATA)
+                            'SETDATA
+                            "Text"
+                            STR))
+              ;; 释放 HTML 对象
+              (vlax-release-object HTML)
+              T))
+    )
+)
 
+;; 主命令函数：计算面积并复制到剪贴板
+(defun C:CopyAreaToClipboard (/ CURVE TAREA SS N SUMAREA old_error *error*)
+  ;; 定义错误处理函数
+  (defun *error* (msg)
+    (if old_error (setq *error* old_error))
+    (if (= 'vla-object (type CURVE))
+      (vlax-release-object CURVE)
+    )
+    (princ (strcat "\n错误: " msg))
+    (princ)
+  )
+  (setq old_error *error*)
   
-  (setq lines (ssget "X" '((0 . "LWPOLYLINE"))))
-  
-  (if lines
+  (if (not (vl-load-com))
     (progn
-      (setq int_pts (get_intersections pt1 pt2 lines))
-      
-      (if int_pts
-        (progn
-          ;; 按距离排序交点及对应的实体
-          (setq int_pts (vl-sort int_pts
-                                '(lambda (a b)
-                                   (< (distance pt1 (car a))
-                                      (distance pt1 (car b))))))
-          
-          ;; 去除重复的实体引用
-          (setq int_pts (remove_duplicate_ents int_pts))
-          
-          ;; 按组赋值高程
-          (assign_elevations_by_pairs int_pts h b)
-          (princ "\n高程赋值完成。")
+      (princ "\n无法加载 COM 接口")
+      (exit)
+    )
+  )
+  (princ "\n请选择要计算面积的对象...")
+  
+  (setq SUMAREA 0)
+  (if (setq SS (ssget '((0 . "CIRCLE,ELLIPSE,LINE,*POLYLINE,SPLINE,ARC,HATCH"))))
+    (progn
+      (setq N 0)
+      (repeat (sslength SS)
+        (if (setq CURVE (vl-catch-all-apply 'vlax-ename->vla-object (list (ssname SS N))))
+          (if (vl-catch-all-error-p CURVE)
+            (princ (strcat "\n跳过无效对象: " (vl-princ-to-string N)))
+            (progn
+              (setq TAREA (vla-get-area CURVE))
+              (setq SUMAREA (+ SUMAREA TAREA))
+            )
+          )
         )
-        (princ "\n未找到交点。")
+        (setq N (1+ N))
+      )
+      
+      (if (> SUMAREA 0)
+        (progn
+          (SET-CLIP-STRING (rtos SUMAREA 2 3))
+          (setq c SUMAREA)
+          (princ (strcat "\n总面积: " (rtos SUMAREA 2 3)))
+          (princ "\n面积已复制到剪贴板")
+        )
+        (princ "\n计算面积为0或无效")
       )
     )
-    (princ "\n图中未找到多段线。")
+    (princ "\n未选择任何对象，操作已取消")
   )
   (princ)
 )
 
-(defun get_intersections (p1 p2 ss / i result ent)
-  (setq i 0
-        result '())
-  (while (setq ent (ssname ss i))
-    (setq int_pts (find_inters p1 p2 ent))
-    (if int_pts
-      (foreach int_pt int_pts
-        (setq result (cons (list int_pt ent) result))
-      )
-    )
-    (setq i (1+ i))
-  )
-  result
-)
+;; 添加命令别名 CA 用于快速调用
+(defun C:CA () (C:CopyAreaToClipboard))
 
-(defun find_inters (p1 p2 ent / pts result)
-  ;; 获取多段线的所有顶点
-  (setq pts (get_pline_points ent))
-  (setq result '())
-  
-  ;; 检查每个线段与参考线的交点
-  (while (> (length pts) 1)
-    (setq int_pt (inters p1 p2 (car pts) (cadr pts) nil))
-    (if int_pt
-      (setq result (cons int_pt result))
-    )
-    (setq pts (cdr pts))
-  )
-  result
-)
-
-(defun get_pline_points (ent / pts en)
-  ;; 获取多段线的所有顶点
-  (setq pts '())
-  (setq en (entget ent))
-  (foreach item en
-    (if (= (car item) 10)
-      (setq pts (cons (cdr item) pts))
-    )
-  )
-  (reverse pts)
-)
-
-(defun remove_duplicate_ents (int_pts / result used_ents)
-  ;; 去除重复的实体引用，保持顺序
-  (setq result '()
-        used_ents '())
-  (foreach item int_pts
-    (if (not (member (cadr item) used_ents))
-      (progn
-        (setq result (cons item result))
-        (setq used_ents (cons (cadr item) used_ents))
-      )
-    )
-  )
-  (reverse result)
-)
-
-(defun assign_elevations_by_pairs (int_pts h b / i pairs)
-  ;; 将多段线分组并赋值
-  (setq pairs (group_by_two int_pts)
-        i 0)
-  
-  ;; 为每组多段线赋值相同的高程
-  (foreach pair pairs
-    (setq current_elev (+ h (* i b)))
-    (foreach item pair
-      (set_pline_elevation (cadr item) current_elev)
-    )
-    (setq i (1+ i))
-  )
-)
-
-(defun group_by_two (lst / result pair)
-  ;; 将列表每两个元素分为一组
-  (setq result '())
-  (while (>= (length lst) 2)
-    (setq pair (list (car lst) (cadr lst))
-          result (cons pair result)
-          lst (cddr lst)))
-  ;; 处理最后剩余的单个元素
-  (if lst
-    (setq result (cons (list (car lst)) result))
-  )
-  (reverse result)
-)
-
-(defun set_pline_elevation (ent elev / en new_en)
-  ;; 设置多段线高程
-  (setq en (entget ent))
-  (setq new_en (subst (cons 38 elev)
-                      (assoc 38 en)
-                      en))
-  (entmod new_en)
-  (princ (strcat "\n已设置多段线高程为: " (rtos elev 2 2)))
-)
-
-;; 自动加载设置
-(if (not *elevation_assign_loaded*)
-  (progn
-    (setq *elevation_assign_loaded* T)
-    (prompt "\n多段线高程赋值程序已加载。")
-    (prompt "\n输入 SET_ELEV 运行命令。")
-  )
-)
-
+;; 提示信息
+(princ "\n面积计算程序已加载")
+(princ "\n输入 CopyAreaToClipboard 或 CA 运行命令")
 (princ)
