@@ -32,33 +32,20 @@
 )
 (setq DISPLAY (vla-get-display(vla-get-preferences(vlax-get-acad-object))))
 (setq dclstr 
-"mimg:image_button {
-    aspect_ratio = 0.9;
-    fixed_height = true;
-    fixed_width = true;
-    width = 2.8;
-    horizontal_margin = none;
-    vertical_margin = none;
+"mimg:image_button {aspect_ratio = 0.9 ;fixed_height = true ;
+    fixed_width = true ; width = 2.8 ;horizontal_margin = none ;
+    vertical_margin = none ;
 }
 mmimg:image {
-    aspect_ratio = 0.9;
-    color = -15;
-    fixed_height = true;
-    fixed_width = true;
-    width = 2.8;
-    horizontal_margin = none;
-    vertical_margin = none;
+    aspect_ratio = 0.9 ;    color = -15 ;
+    fixed_height = true ;    fixed_width = true ;
+    width = 2.8 ;    horizontal_margin = none ;
+    vertical_margin = none ;
 }
-rbt:radio_button {
-    horizontal_margin = none;
-    vertical_margin = none;
-    fixed_width = true;
-    width = 36;
-}
-sss:dialog {
-    label = \"颜色选项修改 V1.0\";
+rbt:radio_button{horizontal_margin=none;vertical_margin=none;fixed_width = true ; width = 36;}\n
+sss:dialog {label = \"颜色选项修改 V1.0\" ;
     :text {
-        label = \"AutoCAD 颜色索引 (ACI):\";
+        label = \"AutoCAD 颜色索引 (ACI):\" ;
     }
     :column {
         :column {
@@ -104,25 +91,25 @@ sss:dialog {
 (setq dclstr (strcat dclstr ":mimg{color=0;width = 3;key=\"0\";}\n" ))
               
  (setq dclstr (strcat dclstr                
-    "}:edit_box {key=\"box\";edit_width = 15;fixed_width = true;label = \"颜色\";}} \n"    
+    "}:edit_box {key=\"box\";edit_width = 15 ;fixed_width = true ;label = \"颜色\" ;}} \n"    
      ":boxed_radio_column{key=\"radio\";\n"
-           " :rbt {key=\"a\";label = \"模型窗口背景颜色\";}\n"
-           " :rbt {key=\"b\";label = \"模型十字光标颜色\";}\n"                    
-           " :rbt {key=\"e\";label = \"命令行背景颜色\";}\n"
-           " :rbt {key=\"f\";label = \"命令行文字颜色\";}\n"
-           " :rbt {key=\"c\";label = \"布局窗口背景颜色\";}\n"
-           " :rbt {key=\"d\";label = \"布局十字光标颜色\";}\n"
-           "}} "
-           ":column {\n"
-    ":row {\n"
-        "fixed_width = true;\n"
-        "alignment = centered;\n"
-        ":button {key=\"default\";label=\"全部默认\";}\n"
-        ":spacer {width = 2;}\n"
-        ":button {label=\"    取消    \";is_cancel=true;}\n"
-    "}\n"
-"}}\n"
-))
+           " :rbt {key=\"a\";  label = \"模型窗口背景颜色\" ;}\n"
+           " :rbt {key=\"b\";label = \"模型十字光标颜色\" ;  }\n"                    
+           " :rbt {key=\"e\";label = \"命令行背景颜色\" ;  }\n"
+           " :rbt {key=\"f\";label = \"命令行文字颜色\" ;}\n"
+           " :rbt {key=\"c\";label = \"布局窗口背景颜色\" ;    }\n"
+           " :rbt {key=\"d\";label = \"布局十字光标颜色\" ;   }   \n"
+           " }} "
+           ":column {
+    : row {
+        fixed_width = true;
+        alignment = centered;
+        :button {key=\"default\";label=\"全部默认\";}
+        :spacer {width = 2; }
+        :button {label=\"    取消    \";is_cancel=true;}
+    }
+}}"
+     ))
 
 ;;;;;;;;
 (setq dclname 

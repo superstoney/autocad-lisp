@@ -1,15 +1,17 @@
-;;;; å¤šæ®µçº¿é«˜ç¨‹èµ‹å€¼ç¨‹åº
-;;;; ä½œè€…: superstoney
-;;;; æ—¥æœŸ: 2025-03-22
+;;;; ¶à¶ÎÏß¸ß³Ì¸³Öµ³ÌĞò
+;;;; ×÷Õß: superstoney
+;;;; ÈÕÆÚ: 2025-03-26 11:24:31
+;;;; ¸üĞÂ: ĞŞ¸´Ñ¡Ôñ¿ò´íÎó
 
 (defun c:SET_ELEV (/ pt1 pt2 h b lines int_pts)
   (vl-load-com)
-  (setq pt1 (getpoint "\nè¯·é€‰æ‹©èµ·ç‚¹: "))     
-  (setq pt2 (getpoint pt1 "\nè¯·é€‰æ‹©ç»ˆç‚¹: ")) 
-  (setq h (getreal "\nè¯·è¾“å…¥èµ·å§‹é«˜ç¨‹: "))    
-  (setq b (getreal "\nè¯·è¾“å…¥å¢é‡é«˜ç¨‹: "))    
+  (setq pt1 (getpoint "\nÇëÑ¡ÔñÆğµã: "))     
+  (setq pt2 (getpoint pt1 "\nÇëÑ¡ÔñÖÕµã: ")) 
+  (setq h (getreal "\nÇëÊäÈëÆğÊ¼¸ß³Ì: "))    
+  (setq b (getreal "\nÇëÊäÈëÔöÁ¿¸ß³Ì: "))    
   
-  (setq lines (ssget "X" '((0 . "LWPOLYLINE"))))
+  ;; »ñÈ¡¿ÉÄÜÏà½»µÄ¶à¶ÎÏß
+  (setq lines (get_possible_intersecting_plines pt1 pt2))
   
   (if lines
     (progn
@@ -17,25 +19,88 @@
       
       (if int_pts
         (progn
-          ;; æŒ‰è·ç¦»æ’åºäº¤ç‚¹åŠå¯¹åº”çš„å®ä½“
+          ;; °´¾àÀëÅÅĞò½»µã
           (setq int_pts (vl-sort int_pts
                                 '(lambda (a b)
                                    (< (distance pt1 (car a))
                                       (distance pt1 (car b))))))
           
-          ;; å»é™¤é‡å¤çš„å®ä½“å¼•ç”¨
+          ;; È¥³ıÖØ¸´ÊµÌå
           (setq int_pts (remove_duplicate_ents int_pts))
           
-          ;; æŒ‰ç»„èµ‹å€¼é«˜ç¨‹
+          ;; ¸³Öµ¸ß³Ì
           (assign_elevations_by_pairs int_pts h b)
-          (princ "\né«˜ç¨‹èµ‹å€¼å®Œæˆã€‚")
+          (princ (strcat "\n¹²´¦Àí " (rtos (length int_pts) 2 0) " ¸ö½»µã¡£"))
+          (princ "\n¸ß³Ì¸³ÖµÍê³É¡£")
         )
-        (princ "\næœªæ‰¾åˆ°äº¤ç‚¹ã€‚")
+        (princ "\nÎ´ÕÒµ½½»µã¡£")
       )
     )
-    (princ "\nå›¾ä¸­æœªæ‰¾åˆ°å¤šæ®µçº¿ã€‚")
+    (princ "\nÔÚÖ¸¶¨·¶Î§ÄÚÎ´ÕÒµ½¿É¼ûµÄ¶à¶ÎÏß¡£")
   )
   (princ)
+)
+
+(defun get_possible_intersecting_plines (pt1 pt2 / ss extend-dist min-x max-x min-y max-y)
+  (princ "\n¿ªÊ¼²éÕÒ¿ÉÄÜÏà½»µÄ¶à¶ÎÏß...")
+  
+  ;; ¼ÆËãÀ©Õ¹¾àÀë£¨Ïß¶Î³¤¶ÈµÄ10%£©
+  (setq extend-dist (* (distance pt1 pt2) 0.1))
+  
+  ;; ¼ÆËãÑ¡Ôñ¿òµÄ·¶Î§
+  (setq min-x (- (min (car pt1) (car pt2)) extend-dist)
+        max-x (+ (max (car pt1) (car pt2)) extend-dist)
+        min-y (- (min (cadr pt1) (cadr pt2)) extend-dist)
+        max-y (+ (max (cadr pt1) (cadr pt2)) extend-dist))
+  
+  ;; Ê¹ÓÃ¾ØĞÎÑ¡Ôñ¿òÑ¡Ôñ¶à¶ÎÏß
+  (setq ss (ssget "W" 
+                  (list min-x min-y)
+                  (list max-x max-y)
+                  '((0 . "LWPOLYLINE"))))
+  
+  ;; ¹ıÂË»ñÈ¡¿É¼ûµÄ¶à¶ÎÏß
+  (if ss
+    (progn
+      (princ (strcat "\nÑ¡Ôñ¿òÄÚÕÒµ½¶à¶ÎÏß×ÜÊı: " (rtos (sslength ss) 2 0)))
+      (filter_visible_plines ss)
+    )
+    (progn
+      (princ "\nÑ¡Ôñ¿òÄÚÎ´ÕÒµ½¶à¶ÎÏß¡£")
+      nil
+    )
+  )
+)
+
+(defun filter_visible_plines (ss / ent lst i)
+  (setq lst '()
+        i 0)
+  (while (setq ent (ssname ss i))
+    (if (layer-on-and-thawed-p (cdr (assoc 8 (entget ent))))
+      (setq lst (cons ent lst))
+    )
+    (setq i (1+ i))
+  )
+  
+  (if lst
+    (progn
+      (princ (strcat "\n¿É¼û¶à¶ÎÏßÊıÁ¿: " (rtos (length lst) 2 0)))
+      (ssadd-list lst)
+    )
+    nil
+  )
+)
+
+(defun layer-on-and-thawed-p (layer-name / doc lay)
+  (if (and layer-name
+           (setq doc (vla-get-activedocument (vlax-get-acad-object)))
+           (setq lay (vla-item (vla-get-layers doc) layer-name)))
+    (and
+      (= (vla-get-freeze lay) :vlax-false)    ;; ¼ì²éÊÇ·ñÎ´¶³½á
+      (= (vla-get-layeron lay) :vlax-true)    ;; ¼ì²éÊÇ·ñ¿ªÆô
+    )
+    nil
+  )
 )
 
 (defun get_intersections (p1 p2 ss / i result ent)
@@ -54,11 +119,9 @@
 )
 
 (defun find_inters (p1 p2 ent / pts result)
-  ;; è·å–å¤šæ®µçº¿çš„æ‰€æœ‰é¡¶ç‚¹
   (setq pts (get_pline_points ent))
   (setq result '())
   
-  ;; æ£€æŸ¥æ¯ä¸ªçº¿æ®µä¸å‚è€ƒçº¿çš„äº¤ç‚¹
   (while (> (length pts) 1)
     (setq int_pt (inters p1 p2 (car pts) (cadr pts) nil))
     (if int_pt
@@ -70,7 +133,6 @@
 )
 
 (defun get_pline_points (ent / pts en)
-  ;; è·å–å¤šæ®µçº¿çš„æ‰€æœ‰é¡¶ç‚¹
   (setq pts '())
   (setq en (entget ent))
   (foreach item en
@@ -82,7 +144,6 @@
 )
 
 (defun remove_duplicate_ents (int_pts / result used_ents)
-  ;; å»é™¤é‡å¤çš„å®ä½“å¼•ç”¨ï¼Œä¿æŒé¡ºåº
   (setq result '()
         used_ents '())
   (foreach item int_pts
@@ -97,11 +158,9 @@
 )
 
 (defun assign_elevations_by_pairs (int_pts h b / i pairs)
-  ;; å°†å¤šæ®µçº¿åˆ†ç»„å¹¶èµ‹å€¼
   (setq pairs (group_by_two int_pts)
         i 0)
   
-  ;; ä¸ºæ¯ç»„å¤šæ®µçº¿èµ‹å€¼ç›¸åŒçš„é«˜ç¨‹
   (foreach pair pairs
     (setq current_elev (+ h (* i b)))
     (foreach item pair
@@ -112,13 +171,11 @@
 )
 
 (defun group_by_two (lst / result pair)
-  ;; å°†åˆ—è¡¨æ¯ä¸¤ä¸ªå…ƒç´ åˆ†ä¸ºä¸€ç»„
   (setq result '())
   (while (>= (length lst) 2)
     (setq pair (list (car lst) (cadr lst))
           result (cons pair result)
           lst (cddr lst)))
-  ;; å¤„ç†æœ€åå‰©ä½™çš„å•ä¸ªå…ƒç´ 
   (if lst
     (setq result (cons (list (car lst)) result))
   )
@@ -126,21 +183,28 @@
 )
 
 (defun set_pline_elevation (ent elev / en new_en)
-  ;; è®¾ç½®å¤šæ®µçº¿é«˜ç¨‹
   (setq en (entget ent))
   (setq new_en (subst (cons 38 elev)
                       (assoc 38 en)
                       en))
   (entmod new_en)
-  (princ (strcat "\nå·²è®¾ç½®å¤šæ®µçº¿é«˜ç¨‹ä¸º: " (rtos elev 2 2)))
+  (princ (strcat "\nÒÑÉèÖÃ¶à¶ÎÏß¸ß³ÌÎª: " (rtos elev 2 2)))
 )
 
-;; è‡ªåŠ¨åŠ è½½è®¾ç½®
+(defun ssadd-list (lst / ss)
+  (setq ss (ssadd))
+  (foreach ent lst
+    (ssadd ent ss)
+  )
+  ss
+)
+
+;; ×Ô¶¯¼ÓÔØÉèÖÃ
 (if (not *elevation_assign_loaded*)
   (progn
     (setq *elevation_assign_loaded* T)
-    (prompt "\nå¤šæ®µçº¿é«˜ç¨‹èµ‹å€¼ç¨‹åºå·²åŠ è½½ã€‚")
-    (prompt "\nè¾“å…¥ SET_ELEV è¿è¡Œå‘½ä»¤ã€‚")
+    (prompt "\n¶à¶ÎÏß¸ß³Ì¸³Öµ³ÌĞòÒÑ¼ÓÔØ¡£")
+    (prompt "\nÊäÈë SET_ELEV ÔËĞĞÃüÁî¡£")
   )
 )
 

@@ -1,13 +1,13 @@
-;;;; å¤šæ®µçº¿é«˜ç¨‹èµ‹å€¼ç¨‹åº
-;;;; ä½œè€…: superstoney
-;;;; æ—¥æœŸ: 2025-03-22
+;;;; ¶à¶ÎÏß¸ß³Ì¸³Öµ³ÌĞò
+;;;; ×÷Õß: superstoney
+;;;; ÈÕÆÚ: 2025-03-22
 
 (defun c:SET_ELEV (/ pt1 pt2 h b lines int_pts)
   (vl-load-com)
-  (setq pt1 (getpoint "\nè¯·é€‰æ‹©èµ·ç‚¹: "))     
-  (setq pt2 (getpoint pt1 "\nè¯·é€‰æ‹©ç»ˆç‚¹: ")) 
-  (setq h (getreal "\nè¯·è¾“å…¥èµ·å§‹é«˜ç¨‹: "))    
-  (setq b (getreal "\nè¯·è¾“å…¥å¢é‡é«˜ç¨‹: "))    
+  (setq pt1 (getpoint "\nÇëÑ¡ÔñÆğµã: "))     
+  (setq pt2 (getpoint pt1 "\nÇëÑ¡ÔñÖÕµã: ")) 
+  (setq h (getreal "\nÇëÊäÈëÆğÊ¼¸ß³Ì: "))    
+  (setq b (getreal "\nÇëÊäÈëÔöÁ¿¸ß³Ì: "))    
   
   (setq lines (ssget "X" '((0 . "LWPOLYLINE"))))
   
@@ -17,23 +17,23 @@
       
       (if int_pts
         (progn
-          ;; æŒ‰è·ç¦»æ’åºäº¤ç‚¹åŠå¯¹åº”çš„å®ä½“
+          ;; °´¾àÀëÅÅĞò½»µã¼°¶ÔÓ¦µÄÊµÌå
           (setq int_pts (vl-sort int_pts
                                 '(lambda (a b)
                                    (< (distance pt1 (car a))
                                       (distance pt1 (car b))))))
           
-          ;; å»é™¤é‡å¤çš„å®ä½“å¼•ç”¨
+          ;; È¥³ıÖØ¸´µÄÊµÌåÒıÓÃ
           (setq int_pts (remove_duplicate_ents int_pts))
           
-          ;; æŒ‰ç»„èµ‹å€¼é«˜ç¨‹
+          ;; °´×é¸³Öµ¸ß³Ì
           (assign_elevations_by_pairs int_pts h b)
-          (princ "\né«˜ç¨‹èµ‹å€¼å®Œæˆã€‚")
+          (princ "\n¸ß³Ì¸³ÖµÍê³É¡£")
         )
-        (princ "\næœªæ‰¾åˆ°äº¤ç‚¹ã€‚")
+        (princ "\nÎ´ÕÒµ½½»µã¡£")
       )
     )
-    (princ "\nå›¾ä¸­æœªæ‰¾åˆ°å¤šæ®µçº¿ã€‚")
+    (princ "\nÍ¼ÖĞÎ´ÕÒµ½¶à¶ÎÏß¡£")
   )
   (princ)
 )
@@ -54,11 +54,11 @@
 )
 
 (defun find_inters (p1 p2 ent / pts result)
-  ;; è·å–å¤šæ®µçº¿çš„æ‰€æœ‰é¡¶ç‚¹
+  ;; »ñÈ¡¶à¶ÎÏßµÄËùÓĞ¶¥µã
   (setq pts (get_pline_points ent))
   (setq result '())
   
-  ;; æ£€æŸ¥æ¯ä¸ªçº¿æ®µä¸å‚è€ƒçº¿çš„äº¤ç‚¹
+  ;; ¼ì²éÃ¿¸öÏß¶ÎÓë²Î¿¼ÏßµÄ½»µã
   (while (> (length pts) 1)
     (setq int_pt (inters p1 p2 (car pts) (cadr pts) nil))
     (if int_pt
@@ -70,7 +70,7 @@
 )
 
 (defun get_pline_points (ent / pts en)
-  ;; è·å–å¤šæ®µçº¿çš„æ‰€æœ‰é¡¶ç‚¹
+  ;; »ñÈ¡¶à¶ÎÏßµÄËùÓĞ¶¥µã
   (setq pts '())
   (setq en (entget ent))
   (foreach item en
@@ -82,7 +82,7 @@
 )
 
 (defun remove_duplicate_ents (int_pts / result used_ents)
-  ;; å»é™¤é‡å¤çš„å®ä½“å¼•ç”¨ï¼Œä¿æŒé¡ºåº
+  ;; È¥³ıÖØ¸´µÄÊµÌåÒıÓÃ£¬±£³ÖË³Ğò
   (setq result '()
         used_ents '())
   (foreach item int_pts
@@ -97,11 +97,11 @@
 )
 
 (defun assign_elevations_by_pairs (int_pts h b / i pairs)
-  ;; å°†å¤šæ®µçº¿åˆ†ç»„å¹¶èµ‹å€¼
+  ;; ½«¶à¶ÎÏß·Ö×é²¢¸³Öµ
   (setq pairs (group_by_two int_pts)
         i 0)
   
-  ;; ä¸ºæ¯ç»„å¤šæ®µçº¿èµ‹å€¼ç›¸åŒçš„é«˜ç¨‹
+  ;; ÎªÃ¿×é¶à¶ÎÏß¸³ÖµÏàÍ¬µÄ¸ß³Ì
   (foreach pair pairs
     (setq current_elev (+ h (* i b)))
     (foreach item pair
@@ -112,13 +112,13 @@
 )
 
 (defun group_by_two (lst / result pair)
-  ;; å°†åˆ—è¡¨æ¯ä¸¤ä¸ªå…ƒç´ åˆ†ä¸ºä¸€ç»„
+  ;; ½«ÁĞ±íÃ¿Á½¸öÔªËØ·ÖÎªÒ»×é
   (setq result '())
   (while (>= (length lst) 2)
     (setq pair (list (car lst) (cadr lst))
           result (cons pair result)
           lst (cddr lst)))
-  ;; å¤„ç†æœ€åå‰©ä½™çš„å•ä¸ªå…ƒç´ 
+  ;; ´¦Àí×îºóÊ£ÓàµÄµ¥¸öÔªËØ
   (if lst
     (setq result (cons (list (car lst)) result))
   )
@@ -126,21 +126,21 @@
 )
 
 (defun set_pline_elevation (ent elev / en new_en)
-  ;; è®¾ç½®å¤šæ®µçº¿é«˜ç¨‹
+  ;; ÉèÖÃ¶à¶ÎÏß¸ß³Ì
   (setq en (entget ent))
   (setq new_en (subst (cons 38 elev)
                       (assoc 38 en)
                       en))
   (entmod new_en)
-  (princ (strcat "\nå·²è®¾ç½®å¤šæ®µçº¿é«˜ç¨‹ä¸º: " (rtos elev 2 2)))
+  (princ (strcat "\nÒÑÉèÖÃ¶à¶ÎÏß¸ß³ÌÎª: " (rtos elev 2 2)))
 )
 
-;; è‡ªåŠ¨åŠ è½½è®¾ç½®
+;; ×Ô¶¯¼ÓÔØÉèÖÃ
 (if (not *elevation_assign_loaded*)
   (progn
     (setq *elevation_assign_loaded* T)
-    (prompt "\nå¤šæ®µçº¿é«˜ç¨‹èµ‹å€¼ç¨‹åºå·²åŠ è½½ã€‚")
-    (prompt "\nè¾“å…¥ SET_ELEV è¿è¡Œå‘½ä»¤ã€‚")
+    (prompt "\n¶à¶ÎÏß¸ß³Ì¸³Öµ³ÌĞòÒÑ¼ÓÔØ¡£")
+    (prompt "\nÊäÈë SET_ELEV ÔËĞĞÃüÁî¡£")
   )
 )
 
