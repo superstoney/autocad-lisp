@@ -190,6 +190,57 @@
     (princ)
 )
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;列出选择元素的图层名称
+(defun C:ListElementLayers (/ ss layers uniqueLayers)
+  ;; 辅助函数：获取DXF组码值
+  (defun dxf (ent i) (cdr (assoc i (entget ent))))
+  
+  ;; 辅助函数：去重
+  (defun unique (lst / out)
+    (while lst
+      (if (not (member (car lst) out))
+        (setq out (cons (car lst) out))
+      )
+      (setq lst (cdr lst))
+    )
+    (reverse out)
+  )
+
+  ;; 主程序
+  (if (setq ss (ssget))  ; 提示用户选择元素
+    (progn
+      ;; 收集所有选中元素的图层名称
+      (setq layers 
+        (mapcar '(lambda (x) (dxf x 8)) 
+          (vl-remove-if-not 
+            '(lambda (x) (= 'ENAME (type x))) 
+            (mapcar 'cadr (ssnamex ss))
+          )
+        )
+      )
+      
+      ;; 去重并按名称升序排序
+      (setq uniqueLayers 
+        (vl-sort (unique layers) 
+          '(lambda (a b) 
+            (< (strcase a) (strcase b))
+          )
+        )
+      )
+      
+      ;; 打印图层名称
+      (princ "\n选中元素所在的图层名称：")
+      (foreach layer uniqueLayers
+        (princ (strcat "\n" layer))
+      )
+      (princ (strcat "\n共 " (itoa (length uniqueLayers)) " 个图层"))
+    )
+    (princ "\n未选择任何元素！")
+  )
+  (princ)
+)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;新建图层并置为当前
 (defun c:CreateLayer (/ layerName)
   ; 显示程序名称

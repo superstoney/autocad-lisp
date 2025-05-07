@@ -1,0 +1,87 @@
+;;旋转增强版 旋转到指定直线方向
+(defun C:Roline(/ *error* k oldsnap pt pt0 pt1 ss ydxy)
+	(defun YDXY (p0);画十字
+		(setq pX1 (polar p0 0 100))
+		(setq pY1 (polar p0 (/ pi 2) 100))
+		(setq pX2 (polar p0 pi 100))
+		(setq pY2 (polar p0 (/ pi -2) 100))
+		(redraw)
+		(grdraw pX1 Px2 3 2)
+		(grdraw pY1 PY2 3 2)
+	)
+	(defun *error*(str)
+		(setvar "osmode" oldsnap)
+		(vla-endundomark *doc*)
+		(and k (vlr-add *autoosmode*))
+		(setvar "cmdecho" 1)
+		(princ)
+	)
+	(setvar "cmdecho" 0)
+	(if (setq k (vlr-added-p *autoosmode*))
+		(vlr-remove *autoosmode*);自动捕捉反应器位于双击文件中
+	)
+	(setq oldsnap (getvar "osmode"))
+	(setvar "osmode" 512)
+	(prompt "请选择整体旋转的实体：")
+	(setq	ss (ssget))
+	(vla-startundomark *doc*)
+	(prompt "请选择旋转直线端点附近点：")
+	(setq
+		pt (getpoint)
+		pt1 (osnap pt "near")
+		pt0 (osnap pt "END")
+	)
+	(YDXY pt0)
+	(command "rotate" ss "" pt0 "r" pt0 pt1)
+	(redraw)
+	(*error* nil)
+)
+
+
+;;;各自中心旋转
+(defun C:ROcenter (/ *error* du1 midp midpoint msg objss res ssets std-sslist xyval1 y)
+	(defun *error*(str)
+		(and y (princ (strcat ">>>旋转" du1 "度")))
+		(vla-endundomark *doc*)
+		(setvar "cmdecho" 1)
+		(princ)
+	)
+	;;获取一个对象的边界框 
+	(defun xyval1 (obj / minpt maxpt pt1 pt2)
+		(vla-GetBoundingBox obj 'minpt 'maxpt)
+		(setq
+			pt1 (vlax-safearray->list minpt)
+			pt2 (vlax-safearray->list maxpt)
+		)
+		(list (car pt1) (cadr pt1) (car pt2) (cadr pt2))
+	)
+	(defun std-sslist (ss / n lst)
+		(if (eq 'pickset (type ss))
+			(repeat (setq n (fix (sslength ss)))
+				(setq lst (cons (ssname ss (setq n (1- n))) lst)))))
+	(defun midp (p1 p2)(mapcar '(lambda (x) (/ x 2.0))(mapcar '+ p1 p2)))
+	(setvar "cmdecho" 0)
+	(prompt "\n请选择需要进行各自中心旋转的物体:")
+	(setq ssets (std-sslist (ssget)))
+	(vla-startundomark *doc*)
+	(if (null HH:rocenterang)(setq HH:rocenterang 180))
+	(setq msg (strcat "\n请输入旋转角度:<" (rtos HH:rocenterang) ">"))
+	(and ssets (setq du1 (getreal msg))(setq HH:rocenterang du1))
+	(if (= du1 nil)(setq du1 HH:rocenterang))
+	(setq du1 (* (/ du1 180) 3.1415926))
+	(setq du1 (angtos du1 0 4))
+	(foreach x ssets
+		(setq objss (vlax-ename->vla-object x))
+		(setq res (xyval1 objss))
+		(setq midpoint (midp (list (nth 0 res) (nth 1 res)) (list (nth 2 res) (nth 3 res))))
+		(if (vl-cmdf "_rotate" x "" midpoint du1)(setq y t))
+	)
+	(*error* nil)
+)
+
+
+
+(princ)
+
+
+

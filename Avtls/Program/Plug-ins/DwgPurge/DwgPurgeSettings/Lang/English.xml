@@ -1,0 +1,216 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+	Author: Ajilal Vijayan [AVappstore]
+	Feel free to edit this file to change the text of Drawing Purge window.
+	This file is used for Changing Language for Drawing Purge.
+	****
+	Only edit the contents which are inside the tag.
+	Eg: <DontChangeThis>You can chage this text</DontChangeThis>
+	****
+	Updated to support Version 8.2.0.0 [2018-06-26]
+    -->
+<AVVADWGPurge>
+	<!-- ListView MainColumns Text  -->
+	<MainColumns>
+		<DwgName>Drawing Name</DwgName>
+		<DwgStatus>Status</DwgStatus>
+		<DwgVersion>Version</DwgVersion>
+		<DwgXrefs>Xrefs</DwgXrefs>
+		<DwgTime>Time elapsed</DwgTime>
+		<DwgOldSize>Old Size</DwgOldSize>
+		<DwgNewSize>New Size</DwgNewSize>
+		<DwgPath>Path</DwgPath>
+	</MainColumns>
+	<PurgeColumns>
+		<!-- ListView PurgeColumns Text  -->
+		<PurgeDGNData>DGN Data</PurgeDGNData>
+		<PurgeDGNComplexData>DGN ComplexData</PurgeDGNComplexData>
+		<PurgeTextStyles>Text Styles</PurgeTextStyles>
+		<PurgeLinetypes>Line types</PurgeLinetypes>
+		<PurgeBlocks>Blocks</PurgeBlocks>
+		<PurgeRegApps>Registry Applications</PurgeRegApps>
+		<PurgeAnnoScales>Annotation Scales</PurgeAnnoScales>
+		<PurgeLayers>Layers</PurgeLayers>
+		<PurgePlotStyles>Plot Styles</PurgePlotStyles>
+		<PurgeDimensions>Dimensions</PurgeDimensions>
+		<PurgeMaterials>Materials</PurgeMaterials>
+		<PurgeMlineStyles>Mline Styles</PurgeMlineStyles>
+		<PurgeMleaderStyles>Mleader Styles</PurgeMleaderStyles>
+		<PurgeTabelStyles>Table Styles</PurgeTabelStyles>
+		<PurgeGroups>Groups</PurgeGroups>
+		<PurgeShapes>Shapes</PurgeShapes>
+		<PurgeVisualStyles>Visual Styles</PurgeVisualStyles>
+		<PurgeRasterImages>Raster Images</PurgeRasterImages>
+		<PurgeDWFUnderLays>DWF UnderLays</PurgeDWFUnderLays>
+		<PurgePDFUnderLays>PDF UnderLays</PurgePDFUnderLays>
+		<PurgeDGNUnderLays>DGN UnderLays</PurgeDGNUnderLays>
+	</PurgeColumns>
+	<GeneralOptions>
+		<!-- Batch Purge Settings General Options  -->
+		<ChangeModDate>Change the file modified date</ChangeModDate>
+		<IncludeSubdir>Search Subdirectories for Drawings</IncludeSubdir>
+		<ClearSelection>Clear the current selection while selecting new files</ClearSelection>
+		<ExportOnlySelected>Export only the items that are selected to Purge</ExportOnlySelected>
+		<SkipFilesPurged>Skip the files that already Purged</SkipFilesPurged>
+		<CreateListofXrefs>Create a List of all the Xrefs for Purging later.</CreateListofXrefs>
+		<AuditDatabase>Audit the Database to fix the errors</AuditDatabase>
+	</GeneralOptions>
+	<SaveDwgOptions>
+		<!-- Batch Purge Settings Save Options  -->
+		<ReplaceDwg>Replace/Overwrite drawing</ReplaceDwg>
+		<SavetoDiffFolder>Save to different folder</SavetoDiffFolder>
+		<DontSave>Don't save drawing</DontSave>
+	</SaveDwgOptions>
+	<FilesToDelete>
+		<chkFileBak>Delete Backup files (filename.bak)</chkFileBak>
+		<chkFileAdt>Delete Audit logs (filename.adt)</chkFileAdt>
+		<chkFileDwl>Delete Drawing lock files (filename.dwl , filename.dwl2)</chkFileDwl>
+		<chkFilePlot>Delete Plot log files (plot.log)</chkFilePlot>
+		<chkFileErr>Delete Error files (acad.err)</chkFileErr>
+	</FilesToDelete>
+	<BatchInfoTexts>
+		<!-- 
+	Info# texts are used for messages for both Dwg-Purge and Batch Purge 
+	-->
+		<Info1>Purge Completed</Info1>
+		<Info2>Purge Cancelled, Click Purge to Continue</Info2>
+		<Info3>Opening file</Info3>
+		<Info4>Auditing</Info4>
+		<Info5>Collecting DGN Data</Info5>
+		<Info6>Purged and Saved</Info6>
+		<Info7>Select items to Purge</Info7>
+		<Info8>No drawings selected</Info8>
+		<Info9>Please check the path you entered</Info9>
+		<Info10>Please add drawings to Purge</Info10>
+		<Info11>Additional Tools</Info11>
+		<Info12>Not Purged</Info12>
+		<Info13>Scan finished, not saved</Info13>
+		<Info14>Purging</Info14>
+		<Info15>Selected</Info15>
+		<Info16>All drawings removed</Info16>
+		<Info17>Results exported to</Info17>
+		<Info18>DGN data found</Info18>
+		<Info19>Xref Status</Info19>
+		<Info20>Purge finished Successfully</Info20>
+		<Info21>Purge Cancelled, Some items may not be Purged</Info21>
+		<Info22>Batch Purge</Info22>
+		<Info23>Batch Purge Settings</Info23>
+		<Info24>Drawing Purge Settings</Info24>
+		<Info25>List of Xrefs</Info25>
+		<Info26>About</Info26>
+		<Info27>Xrefs found with DGN Data</Info27>
+		<Info28>Xrefs</Info28>
+		<Info29>Total</Info29>
+		<Info30>Purged</Info30>
+		<Info31>Skipped</Info31>
+		<Info32>Failed</Info32>
+		<Info33>Added</Info33>
+		<Info34>Removed</Info34>
+		<Info35>Adding</Info35>
+		<Info36>File not found at this path</Info36>
+		<Info37>Please use the 'About' tab to change the settings folder</Info37>
+		<Info38>The selected folder not exists</Info38>
+		<Info39>Invalid characters found in the Suffix text!! &#xD;These characters are not allowed</Info39>
+		<Info40>Current Version</Info40>
+		<Info41>Remove</Info41>
+		<Info42>Remove All</Info42>
+		<Info43>Export the Results</Info43>
+		<Info44>Error while getting version</Info44>
+		<Info45>Not Scanned,'Never Purge Xref' option is selected</Info45>
+		<Info46>Cancelled</Info46>
+		<Info47>DGN data not found in the Xrefs</Info47>
+		<Info48>Xref Purging Cancelled</Info48>
+		<Info49>To cancel press 'Esc key'</Info49>
+		<Info50>Items Purged</Info50>
+		<Info51>Purge Status</Info51>
+		<Info52>Remove all Purged</Info52>
+		<Info53>Remove all Failed</Info53>
+		<Info54>Show File Information</Info54>
+		<Info55>Help</Info55>
+		<Info56>Language changed,run the command again to see the changes</Info56>
+		<Info57>Drawing</Info57>
+		<Info58>Drawings</Info58>
+		<Info59>found</Info59>
+		<Info60>from</Info60>
+		<Info61>folder</Info61>
+		<Info62>folders</Info62>
+		<Info63>Success</Info63>
+		<Info64>File is read-only</Info64>
+		<Info65>Invalid Drawing file, try to AUDIT the drawing</Info65>
+		<Info66>Check the drawing version</Info66>
+		<Info67>Xrefs found in this drawing &#xD; Would you like to scan and purge the Xref's DGN data also ?</Info67>
+		<Info68>not found</Info68>
+		<Info69>Scanning</Info69>
+		<Info70>Loading the required AEC Files..[This is a one time process]</Info70>
+		<Info71>Audit is only available from AutoCAD 2015 version</Info71>
+		<Info72>Reload Xrefs to Update the Drawing</Info72>
+		<Info73>Model Space</Info73>
+		<Info74>Paper Space</Info74>
+		<Info75>Change System Variables</Info75>
+		<Info76>Please select a folder to Backup the files&#xD;Replace option requires a backup location to backup the drawings</Info76>
+	</BatchInfoTexts>
+	<DialogInfo>
+		<!-- 
+	Batch Purge Button,Radiobutton,Combox text and tooltip. 
+	Do not add content for tooltip and text attribute if the content is already empty 
+	Add this for Line break, without quotes '&#xD;' 
+	-->
+		<!-- Buttons -->
+		<btnSelectFiles text="Select Files" tooltip="Click to add Drawings"></btnSelectFiles>
+		<btnSelectFolder text="Select Folder" tooltip="Click to add files from a folder"></btnSelectFolder>
+		<btnPurge text="Purge" tooltip="Click to start Purge"></btnPurge>
+		<btnCancel text="Cancel" tooltip="Cancel the next Drawing/Folder"></btnCancel>
+		<btnClose text="Exit" tooltip="Close this window[press ESC key]"></btnClose>
+		<btnSelectAll text="Select All" tooltip="Select All Items"></btnSelectAll>
+		<btnClearAll text="Clear All" tooltip="Clear All Selected Items"></btnClearAll>
+		<btnSuccessColor text="Purge Finished Color" tooltip="Click to select the Color for Purged items"></btnSuccessColor>
+		<btnFailedColor text="Purge Failed/Error Color" tooltip="Click to select the Color for Failed items"></btnFailedColor>
+		<btnResetColor text="Reset" tooltip="Click to Reset the Colors to Default"></btnResetColor>
+		<btnStngFile text="..." tooltip="Click to change the Settings file location"></btnStngFile>
+		<btnSaveFolder text="..." tooltip="Click to select the folder to save"></btnSaveFolder>
+		<btnBackupFolder text="..." tooltip="Click to select the Backup location"></btnBackupFolder>
+		<btnSearchFolder text="..." tooltip="Search the folder path in the text window on left"></btnSearchFolder>
+		<btnShowPurgeInfo text="" tooltip="Click to Show the Purge Results"></btnShowPurgeInfo>
+		<btnRemoveAll text="" tooltip="Delete all the files selected for purge"></btnRemoveAll>
+		<btnAddXrefs text="Add Xrefs to Purge List" tooltip="Click to add the xrefs to purge list"></btnAddXrefs>
+		<!-- Radio Buttons -->
+		<rdXrefAlwaysPurge text="Always Purge Xref" tooltip="Always Purge Xref without asking"></rdXrefAlwaysPurge>
+		<rdXrefPromptPurge text="Prompt to Purge Xref" tooltip="Ask me before Scanning for Xref Purge"></rdXrefPromptPurge>
+		<rdXrefNeverPurge text="Never Purge Xref" tooltip="Never scan Xrefs for Purging"></rdXrefNeverPurge>
+		<rdDGNFoundStatusBar text="Show at Status Bar" tooltip="Show the DGN data count at status bar"></rdDGNFoundStatusBar>
+		<rdDGNFoundInfoCenter text="Show at Info Center" tooltip="Show the DGN data count at Info Center"></rdDGNFoundInfoCenter>
+		<rdDGNFoundCommandLine text="Show at Command Line" tooltip="Show the DGN data count at command line"></rdDGNFoundCommandLine>
+		<!-- Check box -->
+		<chkShowProgressInWindow text="Show the Purge Progress in a new window" tooltip="Select to Show the Purge progress in a new window"></chkShowProgressInWindow>
+		<chkShowProgressInStatus text="Show Purge Progress in Status bar" tooltip="Select to Show the Purge progress in AutoCAD status bar"></chkShowProgressInStatus>
+		<chkShowTextWindow text="Show AutoCAD text window after Purge" tooltip="Show the text window upon completion of Purge"></chkShowTextWindow>
+		<chkShowDwgPurgeRsltsSlctd text="Display the results of selected items only" tooltip="Show the selected items results after Purging"></chkShowDwgPurgeRsltsSlctd>
+		<chkScanforDGNonStart text="Scan for DGN data while opening a drawing" tooltip="Select to Scan drawing for DGN data while it opening"></chkScanforDGNonStart>
+		<chkApplyExtraTools text="Enable/Disable Additional Tools" tooltip="Select to enable the Additional Tools"></chkApplyExtraTools>
+		<chkZoomExtent text="Zoom to the Extents" tooltip="Select to set Zoom Extent"></chkZoomExtent>
+		<chkChangeSpace text="Change Space to" tooltip="Select to change the space to Model/Paper"></chkChangeSpace>
+		<chkChangeUnits text="Change Drawing Units to" tooltip="Select to Change the Drawing Units"></chkChangeUnits>
+		<chkLayer text="Set Current layer to 0" tooltip="Select to Change the Current Layer to 0"></chkLayer>
+		<chkChangeSysVar text="Change System Variables" tooltip="Select to Change the below listed variables"></chkChangeSysVar>
+		<chkDisableBackup text="Backup the files automatically while using 'Replace/Overwrite' option" tooltip="Select to disable Backup"></chkDisableBackup>
+		<chkIndexCtl text="Enable INDEXCTL variable checking" tooltip="Select to ignore the INDEXCTL error"></chkIndexCtl>
+		<chkDeleteFiles text="Delete other files" tooltip="Delete other files, such as bak,err,plot.log etc"></chkDeleteFiles>
+		<cmbVersion text="" tooltip="Select the AutoCAD version"></cmbVersion>
+		<!-- Text box -->
+		<txtbxSearchPath text="Copy/Paste folder path here" tooltip="Copy and Paste a folder path and press Enter"></txtbxSearchPath>
+		<txtbxSuffix text="" tooltip="Suffix for Purged Drawings"></txtbxSuffix>
+		<!-- Label -->
+		<lblAddXrefs text="Note:The current purge file list will be cleared when adding xrefs" tooltip="Only valid xrefs will be added"></lblAddXrefs>
+		<lblStngFile text="Settings File Location" tooltip="Click to open the Settings file location"></lblStngFile>
+		<lblSuffix text="Add a Suffix:" tooltip="Enter the Suffix text"></lblSuffix>
+		<lblVersion text="Save file as:" tooltip="Select the file version"></lblVersion>
+		<lblWarning text="Warning: Automatic Backup is disabled, to enable visit 'About' tab" tooltip="It is recommended to enable the backup or do a manual backup"></lblWarning>
+		<!-- Group Box -->
+		<grpSavePurge text="Drawing Save Options" tooltip=""></grpSavePurge>
+		<grpPurgeItems text="Select Items to Purge" tooltip=""></grpPurgeItems>
+		<grpGenOptions text="General Options" tooltip=""></grpGenOptions>
+		<grpXrefOptions text="Xref Purge Options" tooltip=""></grpXrefOptions>
+		<grpPrgrsRslts text="Purge Progress and Results" tooltip=""></grpPrgrsRslts>
+		<grpScanDGNMsg text="If any DGN data found, Where you want to see the message ?" tooltip=""></grpScanDGNMsg>
+	</DialogInfo>
+</AVVADWGPurge>

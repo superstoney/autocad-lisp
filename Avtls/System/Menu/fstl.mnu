@@ -1,0 +1,208 @@
+***MENUGROUP=FSTL
+***ACCELERATORS
+["F1"]'2view 
+["F3"]'zoom 0.4XP
+["F4"]'zoom extents
+["F7"] ^C^CPrONOFF
+["F8"] ^C^Copendir
+["F9"] ^C^Cbwl
+["F10"] ^C^Ctheui
+["F11"] ^C^CCleanScreen
+["F12"] ^C^CCleanRubbish
+[CONTROL+"F"] ^C^CFINDOUT
+***POP1
+[效率与输出]
+[cad-->txt\tWB]^C^C_av-dcwb
+[cad-->xls\tTTT]^C^C_TTT
+[统计门窗表\tWF]^C^C_windowsform
+[--]
+[天正加载并整图导出\tT3]^C^C_TSAVEASS
+[临时文件导出\t]^C^C_sv2dwg
+[分图 | 布局批量导出\tFT]^C^C_ExportDwg
+[合并CAD图形文件]^C^C_MergeDwg
+[PDF文件整体导入]^C^C_PDFIMPORTS
+[--]
+[简单压缩<三维变二维>]^C^C_SimpleFlatten
+[屏幕旋转与恢复\tZP]^C^C_CADZP
+[局部重生成\tRR]^C^C_RR
+[--]
+[冷门工具集...\tLM]^C^C_cooltls
+[贱人工具箱...\tY]^C^C_Y
+[特殊标注与说明...\tNN]^C^C_Label-A
+[--]
+[字体乱码解决...\tKK]^C^C_KKfonts
+[清除多行文字格式]^C^C_CleanMtextFormat
+[冗余元素清理]^C^Cdwg-purge
+[--]
+[工具箱功能设置...\tSET]^C^Cseting
+[绘图环境初始化\tDS]^C^C_REAVTLSENV
+[->其它设置]
+[飞诗CAD管理器...\tFST]^C^CFSTL
+[选项配置重置\tREOP]^C^C_REOP
+[命令行文字左对齐]^C^C_habitleft
+[临时文件夹清理]^C^C_cleantemp
+[单色环境]^C^C_1colour
+[<-]
+[--]
+[沟通或升级]^c^cAvtlsWechat
+***POP2
+[计算与修改]
+[快速选择\tSS]^C^Ceasyselect
+[线长选择\tSSL]^C^C_selectbycurvelength
+[过滤"零"长线\t0LL]^C^C_0LLine
+[文字|查找...\tCTRL+F]^C^C_FINDOUT
+[--]
+[反向删除\tREDEL]^C^Credel
+[--]
+[测量长度面积\tT]^C^C_T
+[测量结果标注\tTT]^C^C_TT
+[绘线并标注\t]^C^C_pline-dim
+[自动计数并标注]^C^C_MarkPileNum
+[->文本统计与修改]
+[文字求和与统计\tTS]^C^C_texttotal
+[字母大小写转换\t]^C^C_TCASE
+[图块统计表\tKTJ]^C^C_blockcount
+[连接文字\twbh]^C^C_nt2ot
+[单行批量转多行\t]^C^C_nt2mt
+[文本编号\t]^C^C_textID
+[文本加框\t]^C^C_TextBox
+[<-]
+[--]
+[重建填充边界\tEF]^C^C_EF
+[生成边界轮廓\tEFF]^C^C_EFF
+[--]
+[布尔运算\tBOO]^C^C_BooleanRegion
+[多段线编辑\tDG]^C^C_pl_pt_ed
+[多段线模糊连接\tPEE]^C^C_PEE
+[->多段线其它]
+[多段线连接\tPE]^C^C_PE
+[超级修剪\tTRR]^C^C_TRR
+[寻找区域开口\t]^C^C_CHKOPEN
+[封闭区域开口\t]^C^C_closepline
+[生成多段线边框]^C^C_mPolyOutline
+[复线宽度\tPLW]^C^C_plw
+[<-]
+[--]
+[智能分解块\tXX]^C^C_SMARTEXPL
+[一炸到底【嵌套块】]^C^C_ExplNestBlk
+[炸碎一切\t]^C^C_BlastAll
+[批量群组打散\t]^C^C_explodegroup
+[--]
+[沿线旋转\tRT]^C^C_RT
+[中心旋转\tRTT]^C^C_RTT
+[--]
+[旋转复制\tRC]^C^C_YY-RO&CO
+[动态连续复制\tCCC]^C^C_CCC
+[--]
+[动态双向偏移\tFSS]^C^C_FSS
+***POP3
+[图层与控制]
+[建层并选择\tNL]^C^C_putclayer
+[删指定层\tDL]^C^C_DL
+[删关闭层\t]^C^C_hh-delhidelayer
+[--]
+[设为随层\tSL]^C^C_put-color-bylayer
+[指定当前层\t]^C^C_Activelayer
+[移至当前\tTDQ]^C^C_TDQ
+[图层刷子\tMAA]^C^C_LayerMatch
+[--]
+[->布局与视窗控制]
+[快速布局\t]^C^C_FastVports
+[新建视口\tVS]^C^C_VportsPlus
+[--]
+[在模型与布局中穿越]^C^C_ChangeSpace
+[--]
+[视窗|锁定\tSK]^C^C_SK
+[视窗|解锁\tKS]^C^C_KS
+[模型布局切换\t1E]^C^C_1E
+[视口切换\t2E]^C^C_M&Pspace
+[<-]
+[--]
+[关闭所选\tGG]^C^C_GG
+[关闭其它\tZD]^C^C_ZD
+[反向关闭\tFH]^C^C_FH
+[全部打开\tQB]^C^C_QB
+[--]
+[释放图层控制\t]^C^C_LayerAllF
+[--]
+[->图层锁定与冻结]
+[锁定所选\tSD]^C^C_layerlock
+[解锁所选]^C^C_LayerUnlock
+[--]
+[冻结所选\tDJ]^C^C_LayerFreeze
+[全部解冻]^C^C_LayerFreeAll
+[反向冻结]^C^C_LayerFreeSwap
+[<-]
+[->图形元素显隐]
+[隐藏所选\tHH]^C^C_Hideobj
+[隐藏其它]^C^C_isoobj
+[反向隐藏]^C^C_HideSwap
+[全部显示]^C^C_Showall
+[<-]
+[--]
+[消除图层名前缀]^C^Cunxreflapre
+***TOOLBARS
+**TB_av_value
+[_Toolbar("AV_value", _Top, _Show, 0, 0, 1)]
+[_Button("窗口设置", RCDATA_16_WALK-THROUGH_SAVE,)]^C^C_APIWINSET
+[_Button("新建", RCDATA_16_NEW,)]^C^C_qqnew
+[_Button("打开", RCDATA_16_OPEN,)]^C^C_open
+[_Button("保存", RCDATA_16_SAVE,)]^C^C_qsave
+             [--]
+[_Button("快速打印",RCDATA_16_FRAME_DISPLAYPLOT,)]^C^C_fastprinter
+[_Button("分图与布局导出FT", RCDATA_16_ARRSCHANGE,)]^C^C_ExportDwg
+[_Button("保存为图片", RCDATA_16_WMFOUT,)]^C^C_WMFPLUS
+[_Button("文件重命名", RCDATA_16_RENAME,)]^C^C_av:rename
+             [--]
+[_Button("侧向面板开关", RCDATA_16_AUTHORPALETTE_NEW,)]^C^C_ltoolsswitch
+[_Button("视口同步", RCDATA_16_VISUALCOMPARE,)]^C^C_AGDT
+[_Button("设置参数", RCDATA_16_SET_VARIABLE,)]^C^Cseting
+[_Button("双屏参数设定 F1", RCDATA_16_BNGFWD,)]^C^C2viewset
+[_Button("屏幕旋转zp", RCDATA_16_UCSZAR,)]^C^C_CADZP
+[_Button("乱码修正KK", RCDATA_16_SPELL,)]^C^C_KKfonts
+[_Button("简单压缩", RCDATA_16_SM_EXTEND,)]^C^C_SimpleFlatten
+             [--]
+[_Control(_Undo)]
+[_Control(_Redo)]
+             [--]
+[_Button("连续测距", RCDATA_16_WALK_3DWALK,)]^C^C_pt-pt-dis
+[_Button("快速测量", RCDATA_16_QUICKMEASURE, RCDATA_32_QUICKMEASURE)]^C^C_MEASUREGEOM _M _Y
+[_Button("画线标长", RCDATA_16_DIST, RCDATA_16_DIVIDE)]^C^C_pline-dim
+[_Button("画面标注", RCDATA_16_AREA, RCDATA_32_AREA)]^C^C_manuarea
+             [--]
+[_Button("多段线fg", RCDATA_16_PLINE,)]^C^CFG
+[_Button("自由矩形rec", RCDATA_16_RECTAN,)]^C^CREC
+[_Button("矩形云线ryy", RCDATA_16_REVCLOUD_RECTANGLE,)]^C^C_reccloud
+             [--]
+[_Button("智能分解块xx", RCDATA_16_EXPLODE,)]^C^C_smartexpl
+[_Button("动态连续复制CCC",RCDATA_16_COPYM,)]^C^C_CCC
+[_Button("复制嵌套图元", RCDATA_16_NCOPY,)]^C^C_NCOPY
+[_Button("线打断", RCDATA_16_BRE2PT, RCDATA_32_BRE2PT)]^C^C_dynbreak
+[_Button("多线合并pe", RCDATA_16_JOIN,)]^C^C_PE
+[_Button("对齐al", RCDATA_16_ALIGN_NEW,)]^C^C_align
+[_Button("特性匹配ma", RCDATA_16_MATCH,)]'_matchprop
+[_Button("清理重复对象ov", RCDATA_16_OVERKILL,)]^C^C_ov
+             [--]
+[_Button("文本编号", RCDATA_16_JUSTIFYTXT,)]^C^C_textID
+[_Button("自动计数与标注", RCDATA_16_TCOUNT,)]^C^C_MarkPileNum
+             [--]
+[_Control(_Color)]
+[_Button("图层特性管理器", RCDATA_16_LAYERS,)]'_layer
+[_Control(_Layer)]
+**TB_VIEWPORTS
+[_Toolbar("AV_视口", _Floating, _Hide, 100,210, 1)]
+[_Button("快速布局", RCDATA_16_ALIGN_SPACE,)]^C^C_FastVports
+[_Button("新建视口VS", RCDATA_16_VPONE,)]^C^C_VportsPlus
+[_Button("将对象转换为视口", RCDATA_16_VIEW_VP_OBJECT,)]$M=$(if,$(eq,$(getvar,tilemode),0),^C^C_-vports _o,^C^C^P(ai_viewports_alert)^P)
+[_Button("剪裁现有视口", RCDATA_16_VPCLIP, RCDATA_16_VPCLIP)]^C^C_vpclip
+[_Control(_ViewportScale)]
+[--]
+[_Button("更改空间", RCDATA_16_CHANGE_SPACE,)]^C^C_ChangeSpace
+[_Button("将布局输出到模型", RCDATA_16_EXPORT_LAYOUT,)]^C^C_EXPORTLAYOUT
+[_Button("隔离视口", RCDATA_16_ISOLATEOBJECTS,)]^C^C_actvp
+[--]
+[_Button("锁定视口SK", RCDATA_16_VP_DISPLAY_LOCKED,)]^C^C_SK
+[_Button("解锁视口KS", RCDATA_16_LAYOUT_VIEWPORT_UNLOCKED,)]^C^C_KS
+[_Button("上一布局", RCDATA_16_VIEW_BACK,)]^C^C_LAYOUTUP
+[_Button("下一布局", RCDATA_16_VIEW_FWD,)]^C^C_LAYOUTDOWN
+[_Button("视口进出2E", RCDATA_16_VP_MINIMIZE,)]^C^C_M&Pspace

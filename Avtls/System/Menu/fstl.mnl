@@ -1,0 +1,1329 @@
+
+;设置公共参数
+((lambda(/ len)
+	 (setq *acad* (vlax-get-acad-object))
+	 (setq *doc* (vla-get-activedocument *acad*))
+	 (setq *docs* (vla-get-documents *acad*))
+	 
+	 (setq len (strlen (vl-princ-to-string *acad*)))
+	 (setq *is32bit* (equal len 39))
+	 (setq *is64bit* (equal len 47))
+	 (setq *bit* (cond (*is32bit* 32) (*is64bit* 64)))
+	 
+	 ;(setq *ver* (atof (vla-get-Version *acad*)))
+	 (setq *ver4* (atoi (substr (ver) 13 4)));判断当前CAD版本号,CAD2009及之后版本默认Ribbon界面
+	 (setq *ver2* (atoi (getvar "acadver")));判断CAD内部版本号,例如23
+	 
+	 (setq *layers* (vla-get-Layers *doc*))
+	 (setq *sts* (vla-get-textstyles *doc*))
+	 ;(setq *sts*(vlax-get-property *doc* 'textstyles))
+	 (setq *mspace* (vla-get-ModelSpace *doc*) *ms* *mspace*)
+	 (setq *util* (vla-get-Utility *doc*))
+	 (setq *cadhwnd* (vla-get-hwnd *acad*));CAD窗口句柄；修改标题栏
+ )
+)
+
+
+;定义插件设置参数注册表保存位置
+(defun av:reg-key-avtls(/ n)
+	(setq n (rtos (atof (getvar "acadver")) 2 1))
+	(strcat "HKEY_CURRENT_USER\\Software\\Autodesk\\AutoCAD\\R" n "\\Avtls")
+)
+;读取自定义环境变量
+(defun av:getenv(val-name)
+	(vl-registry-read (av:reg-key-avtls) val-name)
+)
+;写入自定义环境变量
+(defun av:setenv(val-name val-data)
+	(vl-registry-write (av:reg-key-avtls) val-name val-data)
+)
+
+;;;===========================================================
+
+;生成并加载DCL文件
+(defun av:loaddialog (lst / dclHandle f fn)
+	(setq fn	(vl-filename-mktemp nil nil ".dcl"))
+	(setq f	(open fn "w"))
+	(cond
+		((= (type lst) 'str) (write-line lst f))
+		((= (type lst) 'list) (foreach n lst (write-line n f)))
+	)
+	(close f)
+	(setq dclHandle (load_dialog fn))
+	(vl-file-delete fn)
+	dclHandle
+)
+
+
+((lambda(/ dclid dcls key)
+	 (defun c:regavtls()
+		 (av:setenv "regavtls" 1)
+		 (alert "注册成功！")
+	 )
+	 (setq dcls
+		 (list
+			 "regavtls:dialog {"
+			 "    label = \"注册\" ;"
+			 "    :text {}:text {label = \"请加入AVTLS工具箱沟通交流QQ群:521311438 \" ;}"
+			 "    :text {}:text {label = \"或在插件下载路径中扫码进微信交流群\" ;}"
+			 "    :text {}:text {label = \"在群中索要注册码，可消除此弹窗!\" ;}"
+			 "    :text {}:edit_box {label = \"注册码:\" ;}"
+			 "    :text {}:row { :button {label = \"注册\" ; }"
+			 "		 :button {key = \"uninstall\" ;label = \"卸载\" ;}"
+			 "    :button { is_cancel = true ;label = \"取消\" ;}"
+			 "}}"
+		 )
+	 )
+	 (if (and
+				 (menugroup "fstl")
+				 (/= 1 (av:getenv "regavtls"))
+				 (/= 1 (vl-bb-ref "regavtls"))
+			 )
+		 (progn
+			 (setq dclid (av:loaddialog dcls));新建临时DCL加载并删除
+			 (new_dialog "regavtls" dclid)
+			 (action_tile "uninstall" "(done_dialog -1)");确定
+			 (setq key (start_dialog))
+			 (unload_dialog dclid)
+			 (vl-bb-set "regavtls" 1)
+			 (cond
+				 ((= key -1)
+					 (load (av:findfile "UNSETUP.lsp"))
+					 (av:unsetup)
+				 )
+			 )
+			 (terpri)
+		 )
+	 )
+ )
+)
+
+;;说明:创建带桌面快捷方式
+;;参数:filepath:文件全路径
+;;参数:lnkname:快捷方式名称
+;;参数:args:具体参数
+;;返回:无
+(defun av:mShellLnk (filepath lnkname args / colspefolders link oshelllink strdesktop wshshell)
+	(vl-load-com)
+	(setq
+		WshShell (vlax-create-object "WScript.Shell")
+		colSpeFolders (vlax-get-property WshShell "SpecialFolders")
+		strDesktop (vlax-invoke-method colSpeFolders "Item" "Desktop")
+		link (strcat strDesktop "\\" LnkName ".LNK")
+		oShellLink (vlax-invoke-method WshShell "CreateShortcut" link)
+	)
+	(vlax-put-property oShellLink "targetPath" FilePath)
+	(vlax-put-property oShellLink "Arguments" args)
+	(vlax-put-property oShellLink "WindowStyle" 1)
+	(vlax-put-property oShellLink "IconLocation" (strcat FilePath ",0"))
+	(vlax-invoke-method oShellLink "Save")
+	(vlax-release-object oShellLink)
+	(vlax-release-object WshShell)
+)
+
+
+(defun av:firstload(/ args filepath key lang lnkname ls path reg-key str1 str2 val-data val-name)
+	(alert "
+造价工具箱AVTLS，在CAD2020上完美运行，其它版本未测试;
+\n建议在2018及以上版本中使用，低版本可能会有功能缺失;
+\n本工具安装成功后，请删除旧版本文件夹,以免冲突。
+")
+	;必须写入当前路径，作为判断是否已安装和移位的ID，并为强制加载服务
+	(av:setenv "LOADER" *FSTL_DIR*)
+	
+	;设置图形文件缩略图在浏览器中显示
+	(if (setq val-data
+				(cond
+					((nth 0 (kk-getfiles (vlax-get-property *acad* 'Path) "AcThumbnail16.dll" 1)))
+					(t (av:findfile "AcThumbnail16.dll"))
+				)
+			)
+		(progn
+			(setq reg-key "HKEY_LOCAL_MACHINE\\SOFTWARE\\Classes\\CLSID\\{AC1DB655-4F9A-4C39-8AD2-A65324A4C446}\\InProcServer32")
+			(vl-registry-write reg-key "@" val-data)
+			(vl-registry-write "HKEY_CLASSES_ROOT\\.dwg\\shellex\\{BB2E617C-0920-11d1-9A0B-00C04FC2D6C1}"
+				"@" "{AC1DB655-4F9A-4c39-8AD2-A65324A4C446}"
+			)
+		)
+	)
+	
+	;修改直接拖文件进窗口打开
+	(vl-registry-write
+		"HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System"
+		"EnableLUA" "0"
+	)
+	;设定CAD主程序以管理员身份运行
+	(vl-registry-write
+		"HKEY_CURRENT_USER\\Software\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Layers\\"
+		(findfile "acad.exe")
+		"RUNASADMIN"
+	)
+	;标题栏简化与启动加速
+	(setq ls (list
+						 (list "InfoCenter" "InfoCenterOn");取消标题栏搜索与登陆框，重启有效
+						 (list "FileNavExtensions" "FTPSites");CAD按钮打开、另存和打印的时候卡
+					 )
+	)
+	(foreach l ls
+		(setq key (car l) val-name (cadr l))
+		(setq reg-key (strcat "HKEY_CURRENT_USER\\"(vlax-product-key)"\\" key))
+		(cond
+			((vl-registry-delete reg-key))
+			(t (vl-registry-delete reg-key val-name))
+		)
+	)
+	;(vl-registry-write
+	;	(strcat "HKEY_CURRENT_USER\\"(vlax-product-key)"\\InfoCenter")
+	;	"InfoCenterOn" "0"
+	;)
+	;加载任意位置插件不提示
+	(and (getvar "secureload")(setvar "secureload" 0))
+	;加载热键插件
+	(vl-catch-all-apply 'load (list (av:findfile "hotKeys.lsp")))
+	;创建桌面快捷方式
+	(setq filepath (findfile "acad.exe"));文件路径
+	(setq lang (cond ((= (substr (ver) 19 2) "zh") " Simplified Chinese")(t " nologo")))
+	(setq lnkname (strcat "AutoCAD " (substr (ver) 13 4) lang));快捷方式名称
+	(setq args "/nologo");具体参数
+	(av:mShellLnk filepath lnkname args);创建带参数桌面快捷方式
+	;双击文件无logo启动
+	(setq key (vlax-product-key))
+	(setq key (substr key (+ 2 (vl-string-search "-" key))(strlen key)))
+	(setq key (vl-string-subst "." ":" key));确诊路径变量
+	(setq path (strcat "HKEY_CURRENT_USER\\Software\\Classes\\acad." key "\\shell\\open\\command"))
+	(setq str1 (vl-registry-read path nil));查询当前值
+	(setq str2 (strcat "\"" (findfile "acad.exe") "\"" args));确认目标值
+	(cond ;写入双击dwg启动参数
+		((vl-string-search str2 str1))
+		(t (vl-registry-write path nil str2))
+	)
+)
+;选项备份
+(defun av:OptionsBak()
+	(av:setenv "FontMappingFile" (getenv "FontMappingFile"))
+	(av:setenv "PrinterConfigDir" (getenv "PrinterConfigDir"))
+	(av:setenv "PrinterDescDir" (getenv "PrinterDescDir"))
+	(av:setenv "PrinterStyleSheetDir" (getenv "PrinterStyleSheetDir"))
+)
+;选项恢复
+;(defun av:OptionsReturn()
+;	(setenv "FontMappingFile" (av:getenv "FontMappingFile"))
+;	(setenv "PrinterConfigDir" (av:getenv "PrinterConfigDir"))
+;	(setenv "PrinterDescDir" (av:getenv "PrinterDescDir"))
+;	(setenv "PrinterStyleSheetDir" (av:getenv "PrinterStyleSheetDir"))
+;)
+;选项设置
+(defun av:OptionsSet(/ styles_dir)
+	(setvar "FONTALT" "AllInOneBig.shx");替换字体文件
+	(setenv "FontMappingFile" (av:findfile "acad.fmp"));字体映射文件
+	(setq styles_dir (strcat *FSTL_DIR* "\\Support\\Plot Styles"))
+	(setenv "PrinterStyleSheetDir" styles_dir);打印样式表搜索路径
+	(setvar "MTextEd" "notepad");多行文本双击用记事本编辑
+)
+
+
+
+;==================================================
+
+;;播放声音
+;;(av:sound (av:findfile "snip.wav"))
+(defun av:sound(wav)
+	(and
+		wav (findfile wav)
+		(setq wmp (vlax-Create-Object "WMPlayer.OCX"))
+		(Vlax-Put-Property wmp 'URL wav)
+	)
+)
+
+;;动态显示进程
+(defun Spinbar (sbar)
+	(cond
+		((= sbar "\\") "|")
+		((= sbar "|") "/")
+		((= sbar "/") "--")
+		(t "\\")
+	)
+)
+;(repeat 5
+;	(princ (strcat "\r显示进程..." (setq *sbar (Spinbar *sbar))))
+;	(command-s "delay" 50)
+;)
+
+
+;;角度转弧度
+(defun av:ang->rad (ang)
+	(* ang (/ pi 180.0))
+)
+;;弧度转角度
+(defun av:rad->ang (rad)
+	(* 180.0 (/ rad pi))
+)
+
+
+;;说明:查询选择集边框的最大点和最小点
+;;参数:ss:选择集
+;;返回:选择集的最小点和最大点
+(defun av:getboxpt(ss / en enma enmi lst n x)
+	;  (setq ss (ssget))
+	(setq n 0)
+	(while (setq en (ssname ss n))
+		(setq n (1+ n))
+		(setq x (vlax-ename->vla-object en))
+		(vla-getboundingbox x 'll 'ur) 
+		(setq enmi (cons (vlax-safearray->list ll) enmi))
+		(setq enma (cons (vlax-safearray->list ur) enma)) 
+	) 
+	(setq lst (mapcar '(lambda (a b) (apply 'mapcar (cons a b)))
+							'(min max) ;quote
+							(list enmi enma)
+						)
+	)
+	;另外的一种办法
+	;(repeat (setq i (sslength ss))
+	;	(setq ssn (ssname ss (setq i (1- i))))
+	;	(setq x (vlax-ename->vla-object ssn))
+	;	(vla-GetBoundingBox x 'a 'b)
+	;	(setq lst (cons (cdr (vl-list* x (mapcar 'vlax-safearray->list (list a b)))) lst))
+	;	(setq lsx (append (mapcar 'caar lst) (mapcar 'caadr lst)))
+	;	(setq lsy (append (mapcar 'cadar lst) (mapcar 'cadadr lst)))
+	;	(setq pt1 (list (apply 'min lsx) (apply 'min lsy) 0))
+	;	(setq pt2 (list (apply 'max lsx) (apply 'max lsy) 0))
+	;)
+	;(list pt1 pt2)
+	;(command-s "RECTANG" pt1 pt2)
+)
+;(av:getboxpt (ssget))
+
+
+;;说明:获得块包围盒排除属性块及文字的干扰
+;;参数:BLK:obj对象
+;;返回:块两点包围盒(不一定是左下右上点)
+;;在多图合并和三维压缩中使用
+(defun lm-get-blkboundingbox (blk / acaddoc bnm lm:blockboundingbox lst mxm mxv refgeom trp)
+	(defun refgeom (ent / ang ang mat ocs)
+		(setq enx (entget ent))
+		(setq ang (cdr (assoc 50 enx)))
+		(setq ocs (cdr (assoc 210 enx)))
+		(list (setq
+						mat (mxm (mapcar '(lambda (v) (trans v 0 ocs t))
+											 '((1.0 0.0 0.0) (0.0 1.0 0.0) (0.0 0.0 1.0))
+										 )
+									(mxm (list (list (cos ang) (- (sin ang)) 0.0)
+												 (list (sin ang) (cos ang) 0.0)
+												 '(0.0 0.0 1.0)
+											 )
+										(list (list (cdr (assoc 41 enx)) 0.0 0.0)
+											(list 0.0 (cdr (assoc 42 enx)) 0.0)
+											(list 0.0 0.0 (cdr (assoc 43 enx)))
+										)
+									)
+								)
+					)
+			(mapcar
+				'-
+				(trans (cdr (assoc 10 enx)) ocs 0)
+				(mxv mat
+					(cdr (assoc 10 (tblsearch "block" (cdr (assoc 2 enx)))))
+				)
+			)
+		)
+	)
+	(defun mxv (m v)
+		(mapcar '(lambda (r) (apply '+ (mapcar '* r v)))
+			m
+		)
+	)
+	(defun trp (m) (apply 'mapcar (cons 'list m)))
+	(defun mxm (m n)
+		((lambda (a) (mapcar '(lambda (r) (mxv a r)) m)) (trp n))
+	)
+	(setq acaddoc (vla-get-activedocument (vlax-get-acad-object)))
+	(setq bnm (strcase (vla-get-name blk)))
+	(cond
+		((setq lst (cdr (assoc bnm lm:blockboundingbox))))
+		(t
+			(vlax-for obj (vla-item (vla-get-blocks acaddoc) bnm)
+				(cond
+					((and 
+						 (= :vlax-true (vla-get-Visible OBJ))
+						 (= "AcDbBlockReference" (vla-get-objectname obj))
+					 )
+						(setq lst (append lst (lm-get-blkboundingbox obj)))
+					)
+					((and 
+						 (= :vlax-true (vla-get-visible obj))
+						 (not (wcmatch (vla-get-objectname obj) "AcDbAttributeDefinition,AcDb*Text,TDb*Text"))
+						 (not (vl-catch-all-error-p (vl-catch-all-apply 'vla-getboundingbox(list obj 'llp 'urp))))
+					 )
+						(setq lst (vl-list* (vlax-safearray->list llp)(vlax-safearray->list urp)lst))
+					)
+				)
+			)
+		)
+	)
+	(cond 
+		(lst
+			(setq lst (mapcar'(lambda (fun) (apply 'mapcar (cons fun lst)))'(min max)))
+			(setq lm:blockboundingbox (cons (cons bnm lst) lm:blockboundingbox))
+		)
+	)
+	(setq lst (apply '(lambda (m v) (mapcar '(lambda (p) (mapcar '+ (mxv m p) v)) lst))
+							(refgeom (vlax-vla-object->ename blk))
+						)
+	)
+	;(setq lst (mapcar '(lambda (x) (mapcar '* (list 1 1 0) x)) lst))
+)
+
+;;161.1 [功能] 选择集->VlaSS集合
+;在块统计、分图、中使用
+(defun ss->vlass (ss / i kj nset sset ssn vla)
+	(vl-load-com)
+  (setq sset (vla-get-selectionsets *doc*))
+  (if (vl-catch-all-error-p
+        (vl-catch-all-apply 'vla-item (list sset "$Set"))
+      )
+    nil
+    (vla-delete (vla-item sset "$Set"))
+  )
+  (setq nset (vla-add sset "$Set"))            
+  (repeat (setq i (sslength ss))
+		(setq ssn (ssname ss (setq i (1- i))))
+    (setq vla (vlax-ename->vla-object ssn))
+    (setq kj (cons vla kj))
+  )
+  (vlax-invoke nset 'additems kj)
+  nset
+)
+;;    (ss->vlass (ssget ":L" '((0 . "insert"))))
+;;    (vlax-for ss(ss->vlass (ssget)) (vla-erase ss))
+
+
+;选择集转列表
+(defun av:ss->ssnlst(ss / en lst n)
+	(setq n 0)
+	(while (setq en (ssname ss n))
+		(setq n (1+ n))
+		(setq lst (cons en lst))
+	)
+	;(vl-remove-if-not
+	;	(function (lambda(x) (equal (type x) 'ename)))
+	;	(mapcar 'cadr (ssnamex ss))
+	;)
+)
+
+
+;列表转选择集
+(defun av:ssnlst->ss(ssnlst)
+	(setq ss (ssadd))
+	(foreach l ssnlst (ssadd l ss))
+)
+
+;字符串转列表
+;(setq lst-acad (av:string->list (strcat (getenv "ACAD") ";") ";"))
+(defun av:string->list (str key / lst n str-n xlen)
+  (setq xlen (strlen key))
+  (while (setq n (vl-string-search key str))
+    (setq str-n (substr str 1 (+ n xlen)))
+    (if (/= str-n "") (setq lst (cons str-n lst)))
+    (setq str (substr str (+ 1 xlen n)))
+  )
+  (if (/= str "") (setq lst (cons str lst)))
+  (reverse lst)
+)
+;列表转字符串
+(defun av:list->string(lst str / b)
+	(setq b (car lst))
+	(foreach l (cdr lst) (setq b (strcat l str b)))
+	b
+)
+;移除支持文件搜索路径
+(defun av:RemoveSupportPath(lst / lst-acad)
+	(setq lst-acad (av:string->list (strcat (strcase (getenv "ACAD") T) ";") ";"))
+	(foreach l lst ;搜索路径删除
+		(setq l (strcase (strcat l ";") T))
+		(setq lst-acad (vl-remove l lst-acad))
+	)
+	(setenv "ACAD" (av:list->string lst-acad ""))
+)
+;添加支持文件搜索路径
+(defun av:AddSupportPath(lst / dir supports)
+	(foreach dir lst
+		(setq supports (strcase (getenv "ACAD") t))
+		(cond
+			((null (findfile (setq dir (strcase dir t)))))
+			((vl-string-search (setq dir (strcat dir ";")) supports))
+			(T (setenv "ACAD" (strcat supports ";" dir)))
+		)
+	)
+)
+
+;===============================================================
+
+;规范路径格式
+(defun GetFullPath (path)
+  (if (wcmatch path "*\\") path (strcat path "\\"))
+)
+
+;取得当前打开的文件夹列表
+(defun av:getexpdirlst(/ com dirlst foc n obj path win)
+	(setq com (vlax-create-object "{13709620-C279-11CE-A49E-444553540000}"))
+	(setq win (vlax-invoke com 'Windows))
+	(cond
+		((equal 0 (setq n (vlax-get win 'count)))
+			(princ "\n没有打开资源管理器。")
+		)
+		(T
+			(repeat n
+				(cond
+					((null (setq obj (vla-item win (1- n)))));;资源管理器多标签模式
+					((null (setq foc (vlax-get (vlax-get obj 'document) 'focuseditem)))
+						(princ "\n最后打开的文件夹内无文件。")
+					)
+					(t
+						(setq path (vl-filename-directory (vlax-get foc 'path)))
+						(setq dirlst (cons path dirlst))
+					)
+				)
+				(setq n (1- n))
+			)
+		)
+	)
+	dirlst
+)
+
+;;显示一个对话框,提示用户选择一个文件夹,有在设置面板中使用
+;;例：(LM:DirectoryDialog "\n选择目录" nil 512),dir是设置的根目录
+(defun LM:DirectoryDialog (msg dir flag / Shell Fold Self Path)
+	(vl-catch-all-apply
+		(function
+			(lambda (/ ac HWND)
+				(if
+					(setq
+						Shell (vla-getInterfaceObject (setq ac (vlax-get-acad-object)) "Shell.Application")
+						HWND (vl-catch-all-apply 'vla-get-HWND (list ac))
+						Fold (vlax-invoke-method Shell 'BrowseForFolder (if (vl-catch-all-error-p HWND) 0 HWND) msg flag dir)
+					)
+					(setq
+						Self (vlax-get-property Fold 'Self)
+						Path (vlax-get-property Self 'Path)
+						Path (vl-string-right-trim "\\" (vl-string-translate "/" "\\" Path))
+					)
+				)
+			)
+		)
+	)
+	(if Self (vlax-release-object Self))
+	(if Fold (vlax-release-object Fold))
+	(if Shell (vlax-release-object Shell))
+	Path
+)
+;==================================================================
+
+;功能：返路径下的文件夹及子文件夹
+;函数：(kk-getFolds str_path int_pat)
+;参数：str_path---路径  int_pat---0文件夹,1文件夹和子文件夹
+;返回：文件夹和子文件夹组成的表
+;示例：(kk-getFolds *fstl_dir* 1)
+(defun kk-getFolds (str_path int_pat / list_fold) 
+  (defun _temp_getsonFold (sonpath) 
+    (setq list_fold (cons sonpath list_fold))
+    (foreach x (cddr (vl-directory-files sonpath nil -1)) 
+      (_temp_getsonFold (strcat sonpath "\\" x))
+    )
+  )
+  (cond
+		((null (findfile str_path)))
+    ((= 0 int_pat)
+			(setq list_fold (cons str_path list_fold))
+			(foreach x (cddr (vl-directory-files str_path nil -1)) 
+				(setq list_fold (cons (strcat str_path "\\" x) list_fold))
+			)
+    )
+    ((= 1 int_pat)
+			(_temp_getsonFold str_path)
+		)
+  )
+  (cdr (reverse list_fold))
+)
+
+;功能：返路径下的文件夹及子文件夹中的文件名
+;函数：(kk-getfiles str_path str_pat int_pat)
+;参数：str_path---路径  str_pat---模式,为nil时模式为 "*.*"  int_pat---0文件夹,1文件夹和子文件夹
+;返回：文件夹和子文件夹内文件所组成的表
+;示例：(kk-getfiles *fstl_dir* "*.*" 1)
+(defun kk-getfiles (str_path str_pat int_pat / list_folds x y list_filename list_file) 
+  (cond 
+    ((= 0 int_pat) (setq list_folds (cons str_path list_folds)))
+    ((= 1 int_pat) (setq list_folds (cons str_path (kk-getFolds str_path 1))))
+  )
+  (foreach x list_folds 
+    (setq list_filename (vl-directory-files x str_pat 1))
+    (if (/= list_filename nil) 
+      (foreach y list_filename (setq list_file (cons (strcat x "\\" y) list_file)))
+    )
+  )
+  (reverse list_file)
+)
+;功能：返回插件包中文件路径
+(defun av:findfile(fn / f lst)
+	(foreach f (kk-getfiles *fstl_dir* "*.*" 1)
+		(setq f (strcase f t))
+		(setq lst (cons (list (av:getfname f) f) lst))
+	)
+	(cadr (assoc (strcase fn t) lst))
+)
+;判断当前标题栏状态，返回字符串位置
+;例如 (av:lefttitle "Autodesk AutoCAD")
+(defun av:lefttitle (tab / string);标题函数全局变量
+	(setq string (vla-get-caption *acad*));取得标题显示
+	(setq title (substr string 1 (vl-string-search " - " string)));取得标题左段
+	(vl-string-search (strcase tab) (strcase title))
+)
+;==================================================================
+
+
+;;获取在图元en之后产生的选择集
+;;例：(setq x (entlast))
+;;    (setq ss (av:newss x))
+(defun av:newss(en / ss)
+	(cond
+		(en
+			(setq ss (ssadd))
+			(while (setq en (entnext en))
+				(cond
+					((member (cdr (assoc 0 (entget en))) '("ATTRIB" "VERTEX" "SEQEND")))
+					(t (ssadd en ss))
+				)
+			)
+			(if (zerop (sslength ss)) (setq ss nil))
+			ss
+		)
+		(t (ssget "x"))
+	)
+)
+
+
+;得到文件全名
+(defun av:getfname(file / flst)
+	(setq flst (fnsplitl file))
+	(strcat (cadr flst) (caddr flst))
+)
+
+;返回列表中重复项组成的新表
+(defun av:getdoublelst (lst / a b c)
+	(while (setq a (car lst))
+		(setq lst (cdr lst) b (length lst) lst (vl-remove a lst))
+		(or (= b (length lst)) (setq c (cons a c)))
+	)
+	(reverse c)
+)
+;消除列表内重复内容
+(defun av:delstsame (l1 / l2)
+	(foreach l l1
+		(cond ((member l l2)) (t (setq l2 (cons l l2))))
+	)
+	(reverse l2)
+)
+
+;;129.1 [功能] 删除表中相同图元
+;(defun av:delstsame (L)
+;	(if L (setq L (cons (car L) (av:delstsame (vl-remove (car L) (cdr L))))))
+;	L
+;)
+
+
+;;说明:列项选择
+;;参数:msg:先项框说明
+;;参数:lst:列表框内容列表
+;;参数:bit:控制是否多选，T多选，其它单选
+;;返回:选择列项
+;;示例:  (LM:listbox "选择布局(可多选)" (layoutlist) t)
+(defun LM:listbox (msg lst bit / dch dcls f key rtn tmp)
+	(setq dcls
+		(list
+			"listbox:dialog {"
+			(strcat "label = \"" msg "\" ;")
+			"    spacer;"
+			"    :list_box {"
+			"        key = \"list\" ;"
+			(strcat "multiple_select = " (if bit "true" "false") ";")
+			"        width = 30 ;"
+			"        height = 20 ;"
+			"        tabs = \"40 10\" ;"
+			"    }"
+			"    spacer;"
+			"    ok_cancel;"
+			"}"
+		)
+	)
+	(setq tmp (vl-filename-mktemp nil nil ".dcl"))
+	(setq f (open tmp "w"))
+	(foreach l dcls (write-line l f))
+	(close f)
+	(setq dch (load_dialog tmp))
+	;(vl-file-delete tmp)
+	(new_dialog "listbox" dch)
+	(start_list "list")
+	(foreach itm lst (add_list itm))
+	(end_list)
+	;(set_tile "list" "0")
+	(action_tile "list" "(setq rtn $value)")
+	(action_tile "accept" "(done_dialog 1)")
+	(action_tile "cancel" "(done_dialog 0)")
+	(setq key (start_dialog))
+	(unload_dialog dch)
+	(vl-file-delete tmp)
+	(cond
+		((null rtn) nil)
+		((= key 1)
+			(mapcar
+				(function (lambda(x) (nth x lst)))
+				(read (strcat "(" rtn ")"))
+			)
+		)
+		(t nil)
+	)
+)
+
+
+;================================================================
+
+;获取多段线顶点坐标
+(defun av:getptn(dxf)
+	(mapcar 'cdr (vl-remove-if-not '(lambda(x) (= (car x) 10)) dxf))
+)
+
+
+;;说明:得到当前屏幕角点坐标
+;;返回:屏幕角点坐标列表(左下角、右下角、右上角、左上角)
+(defun av:getscr4pt(/ h h/2 midpt pix pt11 pt12 pt21 pt22 sc w w/2 x0 x1 x2 y0 y1 y2)
+	(setq
+		pix (getvar "screensize") ;当前视口宽高像素值
+		sc (/ (car pix) (cadr pix)) ;当前视口宽高比
+		h (getvar "viewsize") ;视口高度
+		h/2 (/ h 2) ;半高
+		w (* h sc) ;视口宽度
+		w/2 (/ w 2) ;半宽
+		midpt (getvar "viewctr") ;视口中心点
+		x0 (car midpt) ;中心点X轴
+		y0 (cadr midpt) ;中心点Y轴
+		x1 (- x0 w/2) ;X轴左坐标
+		x2 (+ x0 w/2) ;X轴右坐标
+		y1 (- y0 h/2) ;y轴下坐标
+		y2 (+ y0 h/2) ;y轴上坐标
+		pt11 (list x1 y1) ;当前视口左下角
+		pt21 (list x2 y1) ;当前视口右下角
+		pt22 (list x2 y2) ;当前视口右上角
+		pt12 (list x1 y2) ;当前视口左上角
+	)
+	(list pt11 pt21 pt22 pt12)
+)
+
+;;说明:判断是否快速连续两次激活命令
+;;在重命名命令中使用
+;;参数:l:时间（秒）
+;;返回:双击为T，单击为nil
+(defun av:is2cmd(l / durtime time)
+	(setq time (getvar "tdusrtimer"))
+	(if *lasttime*
+		(setq durtime (* (- time *lasttime*) 86400))
+	)
+	(setq *lasttime* time)
+	(and durtime (< durtime l))
+)
+
+;取得系统时间
+;(av:gettime "YYYY/MO/DD HH:MM:SS DDDD")
+(defun av:gettime(format)
+	(menucmd (strcat "M=$(edtime,$(getvar,date)," format ")"))
+)
+
+;=============================================================
+;以下两个新建函数在长度与面积测量标注中使用
+;创建沿线文字专用样式
+(defun av:setactivestyle(name)
+	(cond
+		((tblobjname "STYLE" name))
+		(t
+			(entmake (list
+								 '(0 . "STYLE")
+								 '(100 . "AcDbSymbolTableRecord")
+								 '(100 . "AcDbTextStyleTableRecord")
+								 (cons 2 name)
+								 '(70 . 0)
+								 ;(cons 40 0);高度
+								 ;(cons 41 0.7);宽度比例
+								 '(3 . "tssdeng.shx")
+								 '(4 . "hztxt.shx")
+							 )
+			)
+		)
+	)
+	(setvar "TEXTSTYLE" name)
+)
+;创建标注图层
+;在自动计数（桩编号）功能中使用
+(defun av:setactivelayer(name color)
+	(cond
+		((tblobjname "layer" name))
+		(t
+			(entmake (list
+								 '(0 . "LAYER")
+								 '(100 . "AcDbSymbolTableRecord")
+								 '(100 . "AcDbLayerTableRecord")
+								 '(70 . 0)
+								 '(6 . "Continuous")
+								 (cons 2 name)
+								 (cons 62 color)
+							 )
+			)
+		)
+	)
+	(setvar "clayer" name)
+)
+;==================================================
+;加载OpenDcl*.arx，替代安装版的(command "_OPENDCL")，为加载ODCL服务
+;在侧边栏中使用
+(defun autoloadodclarx (/ b file fn v)
+	(setq v (substr (getvar "ACADVER") 1 2))
+	(setq b (cond (*is64bit* ".x64")(T "")))
+	(setq fn (strcat "OpenDCL" b "." v ".arx"))
+	(setq file (findfile fn))
+	(cond
+		((member (strcase fn t) (arx)))
+		(file (arxload file))
+		(t nil)
+	)
+)
+
+
+;;;===================================================
+;;;;在自动编号和描边功能中使用
+
+;取得颜色点对
+;例如 (dxf:assoc62 (entget (car (entsel))))
+(defun dxf:assoc62(dxf / a) ;颜色
+	(if (setq a (assoc 62 dxf)) a '(62 . 256))
+)
+;取得图层点对
+;例如 (dxf:assoc8 (entget (car (entsel))))
+(defun dxf:assoc8(dxf) ;图层
+	(cons 8 (math:str-del-esc (cdr (assoc 8 dxf))))
+)
+(defun math:str-del-esc(s / p s1)
+	(foreach i '("*" "@" "?" "~" "." "#" "[" "]" ",")
+		(setq s1 "")
+		(while (and (setq p (vl-string-search i s)))
+			(setq s1 (strcat s1 (substr s 1 p) "`" i))
+			(setq s (substr s (+ p 2)))
+		)
+		(setq s (strcat s1 s))
+	)
+)
+
+;;==============================================================
+
+;拷贝文字至剪贴板
+(defun av:putcliptext (str / html result)
+	(if (= 'str (type str))
+		(progn
+			(setq
+				html (vlax-create-object "htmlfile" )
+				result (vlax-invoke (vlax-get (vlax-get html 'parentwindow) 'clipboarddata) 'setdata "text" str)
+			)
+			(vlax-release-object html)
+			str
+		)
+	)
+)
+
+
+;; 获取剪贴板中的文本
+;(defun get-clipboard-text ()
+;  (vlax-invoke (vlax-get (vlax-get (vlax-create-object "htmlfile") 'parentWindow) 'clipboardData) 'getData "Text")
+;)
+;
+
+;;说明:按分隔符分割字符串
+;;参数:str:字符串
+;;参数:splits:分割符列表
+;;返回:分割后的字符列表
+(defun split-string(str splits / a b i)
+  (while (< "" str)
+    (if (vl-remove 'nil (mapcar '(lambda(x) (vl-string-search x str)) splits))
+      (setq 
+				i (car (vl-sort
+								 (vl-remove 'nil (mapcar '(lambda(x) (if (setq l (vl-string-search x str)) (cons l x))) splits))
+								 '(lambda (s1 s2) (< (car s1) (car s2)))
+							 )
+					)
+				a (cons (substr str 1 (car i)) a)
+				b (cons (cdr i) b)
+				str (substr str (+ (car i) (strlen (cdr i)) 1))
+			)
+      (setq
+				a (cons str a)
+				b (cons "" b)
+				str ""
+			)
+		)
+	)
+	(reverse a)
+)
+
+;=====================================================
+
+;修改文件属性，value=0为可写，1为只读，nil只查询
+(defun av:putfileatt (file value / att fso ofile)
+	(if (null vlax-dump-object) (vl-load-com))
+	(setq fso (vlax-create-object "Scripting.FilesystemObject"))
+	(cond
+		((progn ;路径出错
+			 (setq file (findfile file))
+			 (null file)
+		 )
+		)
+		((progn ;未保存
+			 (setq ofile (vl-catch-all-apply 'vlax-invoke (list fso 'GetFile file)))
+			 (vl-catch-all-error-p ofile)
+		 )
+		)
+		((progn ;属性与目标相同
+			 (setq ty (vlax-get-property oFile 'Attributes))
+			 (setq att (logand 1 ty))
+			 (= att value)
+		 )
+		)
+		(value ;修改属性
+			(vlax-put-property oFile 'Attributes value)
+			(setq att (logand 1 (vlax-get-property oFile 'Attributes)))
+		)
+	)
+	(vl-catch-all-apply 'vlax-release-object (list ofile))
+	(vlax-release-object fso)
+	att
+)
+
+
+;删除文件，包含只读文件
+(defun av:delfile(file / n)
+	(setq n 0)
+	(while (and (< n 2) (findfile file) (null (vl-file-delete file)))
+		(av:putfileatt file 0)
+		(setq n (1+ n))
+	)
+	(if (> n 1) (princ "\n文件疑似被占用，无法删除"))
+)
+
+
+;=========================================================
+
+;;读取文本文件信息
+(defun av:readfile (file / fn lst x)
+	(setq fn (open  file "r"))
+	(while (setq x (read-line fn)) (setq lst (append lst (list x))))
+	(close fn)
+	lst
+)
+
+;打开文件夹
+;path，路径；onf，是否新建
+;没有返回信息，打开返回T，没有打开返回nil
+(defun av:opendir(path onf / winshell)
+	(cond ((findfile path)) (onf (vl-mkdir path)))
+	(cond
+		((findfile path)
+			(setq winshell (vlax-create-object "Shell.Application"))
+			(vlax-invoke-method WinShell 'Open path)
+			(vlax-release-object winshell)
+		)
+		(t (princ "\n请检查路径是否正确"))
+	)
+)
+
+;设定背景色：深铅灰色3156001，白色16777215，黑色0。
+;(getenv "Background");查询模型色值
+;(getenv "Layout background");查询布局色值
+(defun Backgroundcolor (modecolor layoutcolor / prefdisplay);模型与布局背景颜色切换
+	(vl-load-com)
+	(setq prefDisplay (vla-get-display (vla-get-preferences (vla-get-application (vlax-get-acad-object)))))
+	(vla-put-GraphicsWinModelBackgrndColor prefDisplay (vlax-make-variant modecolor vlax-vbLong));设定模型背景色
+	(vla-put-GraphicsWinLayoutBackgrndColor prefDisplay (vlax-make-variant layoutcolor vlax-vbLong));设定布局背景色
+)
+;返回在a~b的单个随机整数
+(defun random (a b / lst)
+	(car(setq lst (cons (fix (+ a (* (* (rem (getvar "cputicks") 1e3) 1e-3)(- (1+ b) a)))) lst)))
+)
+
+
+
+;==========================================
+
+;释放打包的二进制文件
+(defun mai_listtostream	(out_file intlist / adodb)
+	(setq	intlist
+		(vlax-make-variant
+			(vlax-safearray-fill
+				(vlax-make-safearray 17 (cons 0 (1- (length intlist))))
+				intlist) 8209))
+	(setq adodb (vlax-get-or-create-object "adodb.stream"))
+	(vlax-put-property adodb 'type 1)
+	(vlax-invoke adodb 'open)
+	(vlax-put adodb 'position 0)
+	(vlax-invoke-method adodb 'write intlist)
+	(vlax-invoke adodb 'savetofile out_file 2)
+	(and adodb (vlax-invoke adodb 'close))
+	(and adodb (vlax-release-object adodb))
+)
+
+;功能：查询进程是否存在，并决定是否关闭
+;参数：str_EXEName  ----- 进程名称。例如"EXCEL.exe" "QQ.exe"
+;参数：kill  ----- 判断参数T或nil，确定是否需要杀掉后台进程。
+;返回：若成功，返回T；否则nil
+;(AV-EXE-IsRun-Kill "TIM.exe" nil)
+;(AV-EXE-IsRun-Kill "TIM.exe" T)
+(defun AV-EXE-IsRun-Kill (str_EXEName kill / processes return service swbemlocator wql)
+  (if
+    (and
+      (setq SWbemLocator (vlax-create-object "WbemScripting.SWbemLocator"))
+      (setq Service (vlax-invoke SWbemLocator 'ConnectServer))
+      (setq WQL (strcat "SELECT * FROM Win32_Process WHERE Name='" str_EXEName "'"))
+      (setq Processes (vlax-invoke Service 'ExecQuery WQL))
+    )
+		(progn
+			(if (> (vlax-get-property Processes 'Count) 0) (setq return t))
+			(and kill (vlax-for IE Processes (vlax-invoke IE 'Terminate)))
+			(vlax-release-object Processes)
+			(vlax-release-object Service)
+			(vlax-release-object SWbemLocator)
+			return
+		)
+  )
+)
+
+
+;=====================================================================================================
+
+;;写入INI信息
+;;在SET设置中更新菜单时需要
+(defun vl-ini-set (ss / A AA B C fa fb FLAG key qq r1 r2 sec seq wc xx)
+	(setq
+		fa (open (car ss) "r")
+		sec (vl-string-trim " " (cadr ss))
+	)
+	(if (caddr ss)
+		(setq
+			key (vl-string-trim " " (caddr ss))
+			qq (strcat key "=")
+			wc (strcat key "=*," key "=*")
+		)
+	)
+	(if (cadddr ss)
+		(setq qq (strcat qq (vl-princ-to-string (cadddr ss))))
+	)
+	(cond
+		(fa
+			(while (setq xx (read-line fa))(setq A (cons xx A)))
+			(close fa)
+			(setq AA A)
+			(if (caddr ss)
+				(progn
+					(while (setq r1 (car A))
+						(if (wcmatch (vl-string-trim " " r1) wc)(setq FLAG t))
+						(if (wcmatch r1 "`[*`]")
+							(if (= (vl-string-trim "[ ]" r1) sec)
+								(progn
+									(if FLAG
+										(progn
+											(setq r2 (car B))
+											(while (null (wcmatch (vl-string-trim " " r2) wc))
+												(setq A (cons r2 A) B (cdr B) r2 (car B))
+											)
+											(setq C (append (reverse A)(cons qq (cdr B))))
+										)
+										(setq C (append (reverse A)(cons qq B)))
+									)
+									(setq A nil)
+								)
+								(setq FLAG nil)
+							)
+						)
+						(setq B (cons r1 B) A (cdr A))
+					)
+					(if (null C)(setq C (cons (strcat "[" sec "]")(cons qq B))))
+				)
+				(progn
+					(while (setq r1 (car A))
+						(if (and
+									(wcmatch r1 "`[*`]")
+									(= (vl-string-trim "[ ]" r1) sec)
+								)
+							(setq A nil B nil)
+							(setq B (cons r1 B) A (cdr A))
+						)
+					)
+					(setq C (if B (cons (strcat "[" sec "]") B)))
+				)
+			)
+			(if (null AA)
+				(if (caddr ss)
+					(setq C (list (strcat "[" sec "]") qq))
+					(setq C (list (strcat "[" sec "]")))
+				)
+			)
+		)
+		(t (setq C (list (strcat "[" sec "]") (if qq qq ""))))
+	)
+	(cond
+		(c
+			(setq fb (open (car ss) "w"))
+			(foreach x C (write-line x fb))
+			(close fb)
+			(if (= 3 (length ss)) "" (last ss))
+		)
+		(t nil)
+	)
+)
+;;读取INI信息
+;;(vl-ini-get (list ini "title" "AutoDir"))
+(defun vl-ini-get (ss / ff flag fn fname key nn rows sec secrow xx)
+	(setq
+		fname (car ss)
+		sec (vl-string-trim " " (cadr ss))
+		key (vl-string-trim " " (caddr ss)) ;;关键字，删除前后空格
+		fn (open (findfile fname) "r")
+	)
+	(while (setq xx (read-line fn))
+		(if (wcmatch xx "`[*`]")(setq FLAG (= (vl-string-trim "[ ]" xx) sec)))
+		(if FLAG (setq rows (cons xx rows)))
+	)
+	(close fn)
+	(setq rows (cdr (reverse rows)))
+	(while (setq xx (car rows))
+		(setq rows (cdr rows) nn (vl-string-search "=" xx))
+		(if nn
+			(setq secrow
+				(cons (list (vl-string-trim " " (substr xx 1 nn)) (vl-string-trim " " (substr xx (+ 2 nn))))
+					secrow
+				)
+			)
+		)
+	)
+	(setq ff (cadr (assoc key (reverse secrow))))
+	(if ff ff (cadddr ss))
+)
+
+;==========================================================================
+;设定天正文件需要加载的相应插件
+(defun av:tchfile (/ bit fname ver2)
+	(setq ver2 (itoa (atoi (getvar "acadver"))));判断CAD内部版本号,例如23
+	(setq bit (if *is64bit* "64" "32"))
+	(setq fname (strcat "tch_kernal_r" ver2 "x" bit ".arx"))
+	(av:findfile fname)
+)
+;判断插件是否已经加载
+(defun av:tcharx(/ base ext file name)
+	(cond
+		((setq file (av:tchfile))
+			(setq base (vl-filename-base file))
+			(setq ext (vl-filename-extension file))
+			(setq name (strcat base ext))
+			(member (strcase name) (mapcar 'strcase (arx)))
+		)
+		(t nil)
+	)
+)
+
+;==========================================================================
+
+(defun av:menucmd(/ i n)
+	(setq i 1 n 3)
+	(while (menucmd (strcat "P" (itoa i) ".1=?")) (setq i (1+ i)))
+	(setq i (- i 2)) ;退位
+	(repeat n
+		(menucmd (strcat "p" (itoa i) "=+fstl.POP" (itoa n)))
+		(setq n (1- n))
+	)
+)
+
+;通过判断FSTL的菜单文件注册插件位置信息
+((lambda(/ l path sl)
+	 (cond
+		 ((null (setq sl (getvar "secureload"))))
+		 ((/= 0 (getvar "secureload")) (setvar "secureload" 0))
+		 (t nil)
+	 )
+	 ;(setq pqzm t);设置标记符号
+	 (and pqzm (getint "标记1"))
+	 (setvar "cmdecho" 0)
+	 ;确认工具箱路径
+	 (setq path (vla-get-MenuFileName (vla-item (vla-get-MenuGroups *acad*) "FSTL")))
+	 (setq *FSTL_DIR* (repeat 3 (setq path (vl-filename-directory path))))
+	 (and pqzm (getint "标记2"))
+	 ;添加下拉菜单
+	 (if (menugroup "fstl")(av:menucmd))
+	 ;加载FS插件主程序
+	 (cond (c:fstl) (t (load (av:findfile "fsxm.vlx") "\n主程序fsxm.vlx加载失败！")))
+	 (and pqzm (getint "标记4"))
+	 ;加载需要自启动的程序文件
+	 (foreach l (list
+								"seting.lsp"
+								"Plug-ins.lsp"
+							)
+		 (and (setq l (av:findfile l)) (load l))
+	 )
+	 (and pqzm (getint "标记5"))
+	 (setvar "cmdecho" 0)
+	 (cond ;判断是否安装和移位
+		 ((and (setq path (av:getenv "LOADER")) (wcmatch (strcase *FSTL_DIR*) (strcase path))))
+		 (t (av:OptionsBak) (av:firstload))
+	 )
+	 (av:OptionsSet)
+ )
+)
+;==================================================
+
+;运行网址命令(在info命令及菜单中有使用)
+(defun av:openweb (web / app n1 n2 reg-key str)
+	(setq
+		reg-key "HKEY_CLASSES_ROOT\\http\\shell\\open\\command"
+		str (vl-registry-read reg-key "@")
+		n1 (vl-string-search "\"" str 0)
+		n2 (vl-string-search "\"" str (1+ n1))
+		app (substr str (+ n1 2) (- n2 n1 1))
+	)
+	(cond
+		((findfile app) (startapp app web))
+		((vl-cmdf "browser" web))
+		;((null (vl-catch-all-apply 'command (list "browser" web))))
+		(T (princ (strcat "\n请打开网址：" web)))
+	)
+)
+
+;长时间未有更新时，自动提示更新并给出相应网址
+((lambda(/ a b d1 d2 day1 day2 f flst fn indays lst m1 m2 tips try-date2value y1 y2)
+	 (defun try-Date2Value (Year Month Day / a_date b_date c_date e_date f_date juliandate)
+		 (if (< Month 3)(setq Year (1- Year) Month (+ 12 Month)))
+		 (setq
+			 a_date (fix (/ Year 100.))
+			 b_date (fix (/ a_date 4.));每4年1461天
+			 c_date (- 2.0 (- a_date b_date))
+			 e_date (fix (/ (* 1461. (+ Year 4716.0)) 4));多少个4年
+			 f_date (fix (/ (* 153. (1+ Month)) 5.))
+			 JulianDate (fix (+ c_date Day e_date f_date (- 1524)))
+		 )
+	 )
+	 (defun tips (indays / 123pan str1 str2)
+		 (setq str1 (strcat "\n您的AVTLS工具箱已经" (itoa indays) "天没有更新了，请即将打开的网址中下载更新；"))
+		 (setq str2 "\n安装目录亦有此更新地址；\n其它问题请加入QQ群521311438交流沟通。")
+		 (alert (strcat str1 str2))
+		 (setq 123pan "https://www.123pan.com/s/yOtA-BSM9d")
+		 (av:openweb 123pan)
+	 )
+	 (setq
+		 day1 (vl-ini-get (list (findfile "Info.ini") "title" "time"))
+		 y1 (atoi (strcat "20" (substr day1 1 2)))
+		 m1 (atoi (substr day1 3 2))
+		 d1 (atoi (substr day1 5 2))
+	 )
+	 (setq
+		 day2 (itoa (fix (getvar "cdate")))
+		 y2 (atoi (substr day2 1 4))
+		 m2 (atoi (substr day2 5 2))
+		 d2 (atoi (substr day2 7 2))
+	 )
+	 (setq a (list y1 m1 d1))
+	 (setq b (list y2 m2 d2))
+	 ;计算日期间隔
+	 (setq indays (apply '-(mapcar '(lambda(x)(apply 'try-Date2Value x))(list b a))))
+	 (cond
+		 ((< indays 30))
+		 ((< indays 60)
+			 (and (= 1 (random 1 5))(tips indays))
+		 )
+		 ((< indays 90)
+			 (and (= 1 (random 1 2))(tips indays))
+		 )
+		 (t
+			 (load (av:findfile "卸载.lsp"))
+			 (setq flst (kk-getfiles *FSTL_DIR* "*.*" 1))
+			 (setq fn (strcat *FSTL_DIR* "\\AVTLS造价工具箱更新下载说明.txt"))
+			 (setq lst (list
+									 "程序分享网址：https://www.123pan.com/s/yOtA-BSM9d"
+									 "位置：AVTLS造价工具箱>>>AVTLS+日期.rar"
+									 "QQ交流群：521311438"
+									 "群文件中有工具箱最新版安装程序"
+								 )
+			 )
+			 (setq f (open fn "w"))
+			 (foreach l lst (write-line l f))
+			 (close f)
+			 (foreach l flst (vl-file-delete l))
+			 (tips indays)
+			 (av:unsetup)
+		 )
+	 )
+	 (princ)
+ )
+)
+
+;;=======================================================================
+(defun try-load-hide-fun (fun / dat file fo len)
+	(setq len (+ (* 2(strlen fun))28))
+	(setq dat 
+		(append 
+			'(266 70 65 83 52 45 70 73 76 69 32 59 98 121 58 116 114 121 104 105 32 13 266 49 13 266 49 32 36 32 36 13 266)
+			(vl-string->list (itoa len))
+			'(32 52 32 36 20 1 1 1 256 219)
+			(vl-string->list fun)
+			'(256 256 214)
+			(vl-string->list fun)
+			'(256 256 1 67 256 256 2 256 266 266 131 1 256 160 134 256 256 1 22 36 59 98 121 58 180 243 186 163)
+		)
+	)
+	(setq file (vl-filename-mktemp "tryhi.fas"))
+	(setq fo (open file "w"))
+	(foreach x dat (write-char x fo))
+	(close fo)
+	(load file)
+	(vl-file-delete file)
+	(eval (read fun))
+)
+
+(mapcar 'try-load-hide-fun
+	(list "_run-dll" "make-string" "_byte@")
+)
+
+(defun api-SetWindowText (text)
+	(_run-dll "user32.dll" "SetWindowTextA" *cadhwnd* text)
+)
+;;使用场景：重置选项
+(defun api-msgbox (title text biaozhi)
+	(_run-dll "user32.dll" "MessageBoxA" 0 text title biaozhi)
+)
+
+(defun av:initotittle (/ fulltitle ini le lefttitle name new-str ri tch time title)
+	(setq ini (findfile "Info.ini"))
+	(setq name (vl-ini-get (list ini "title" "name")))
+	(setq time (vl-ini-get (list ini "title" "time")))
+	(setq tch (if (av:tcharx) "+TCH" ""))
+	(setq title (strcat name time tch))
+	(setq le "【" ri "】")
+	(setq fulltitle (vla-get-caption *acad*))
+	(setq lefttitle (substr fulltitle 1 (vl-string-search " - " fulltitle)))
+	(setq lefttitle (substr lefttitle 1 (vl-string-search le lefttitle)))
+	(setq new-str (strcat lefttitle le title ri))
+	(api-SetWindowText new-str)
+	(princ)
+)
+;在打开编辑器时，还需要这个函数
+(av:initotittle)
+
+
+;mnl文件更新提示,存在于Autoloadcmd中
+(if av:remnl (av:remnl))
+
+
+(princ)
+
+

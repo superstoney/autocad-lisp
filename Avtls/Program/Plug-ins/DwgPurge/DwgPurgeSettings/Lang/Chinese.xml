@@ -1,0 +1,216 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+	Author: Ajilal Vijayan [AVappstore]
+	Feel free to edit this file to change the text of Drawing Purge window.
+	This file is used for Changing Language for Drawing Purge.
+	****
+	Only edit the contents which are inside the tag.
+	Eg: <DontChangeThis>You can chage this text</DontChangeThis>
+	****
+    Updated to support Version 8.2.0.0 [2018-06-26]
+    -->
+<AVVADWGPurge>
+    <!-- ListView MainColumns Text  -->
+    <MainColumns>
+        <DwgName>图纸名称</DwgName>
+        <DwgStatus>状态</DwgStatus>
+        <DwgVersion>版本</DwgVersion>
+        <DwgXrefs>外部参照</DwgXrefs>
+        <DwgTime>清理时间</DwgTime>
+        <DwgOldSize>清理前大小</DwgOldSize>
+        <DwgNewSize>清理后大小</DwgNewSize>
+        <DwgPath>路径</DwgPath>
+    </MainColumns>
+    <PurgeColumns>
+        <!-- ListView PurgeColumns Text  -->
+        <PurgeDGNData>DGN 数据</PurgeDGNData>
+        <PurgeDGNComplexData>DGN 复杂数据</PurgeDGNComplexData>
+        <PurgeTextStyles>文字样式</PurgeTextStyles>
+        <PurgeLinetypes>线型</PurgeLinetypes>
+        <PurgeBlocks>块</PurgeBlocks>
+        <PurgeRegApps>注册程序数据</PurgeRegApps>
+        <PurgeAnnoScales>注释比例</PurgeAnnoScales>
+        <PurgeLayers>图层</PurgeLayers>
+        <PurgePlotStyles>打印样式</PurgePlotStyles>
+        <PurgeDimensions>标注样式</PurgeDimensions>
+        <PurgeMaterials>材质</PurgeMaterials>
+        <PurgeMlineStyles>多线样式</PurgeMlineStyles>
+        <PurgeMleaderStyles>多重引线样式</PurgeMleaderStyles>
+        <PurgeTabelStyles>表格样式</PurgeTabelStyles>
+        <PurgeGroups>组</PurgeGroups>
+        <PurgeShapes>形</PurgeShapes>
+        <PurgeVisualStyles>视觉样式</PurgeVisualStyles>
+        <PurgeRasterImages>光栅图像</PurgeRasterImages>
+        <PurgeDWFUnderLays>DWF 参考底图</PurgeDWFUnderLays>
+        <PurgePDFUnderLays>PDF 参考底图</PurgePDFUnderLays>
+        <PurgeDGNUnderLays>DGN 参考底图</PurgeDGNUnderLays>
+    </PurgeColumns>
+    <GeneralOptions>
+        <!-- Batch Purge Settings General Options  -->
+        <ChangeModDate>更改文件修改日期</ChangeModDate>
+        <IncludeSubdir>搜索用于图纸的子目录</IncludeSubdir>
+        <ClearSelection>在选择新文件时清除当前选择</ClearSelection>
+        <ExportOnlySelected>仅导出选择清理的文件</ExportOnlySelected>
+        <SkipFilesPurged>跳过已清理的文件</SkipFilesPurged>
+        <CreateListofXrefs>创建清理所有外部参照的列表。</CreateListofXrefs>
+        <AuditDatabase>检查数据库并修复错误</AuditDatabase>
+    </GeneralOptions>
+    <SaveDwgOptions>
+        <!-- Batch Purge Settings Save Options  -->
+        <ReplaceDwg>替换/覆盖文件</ReplaceDwg>
+        <SavetoDiffFolder>保存到其他文件夹</SavetoDiffFolder>
+        <DontSave>不保存文件</DontSave>
+    </SaveDwgOptions>
+    <FilesToDelete>
+        <chkFileBak>删除备份文件（filename.bak）</chkFileBak>
+        <chkFileAdt>删除核查日志（filename.adt）</chkFileAdt>
+        <chkFileDwl>删除绘图锁定文件（filename.dwl，filename.dwl2）</chkFileDwl>
+        <chkFilePlot>删除打印日志（plot.log）</chkFilePlot>
+        <chkFileErr>删除错误文件（acad.err）</chkFileErr>
+    </FilesToDelete>
+    <BatchInfoTexts>
+        <!-- 
+	Info# texts are used for messages for both Dwg-Purge and Batch Purge 
+	-->
+        <Info1>清理完成</Info1>
+        <Info2>清理取消，单击清理以继续</Info2>
+        <Info3>打开文件</Info3>
+        <Info4>检查</Info4>
+        <Info5>收集DGN数据</Info5>
+        <Info6>清理并保存</Info6>
+        <Info7>选择要清理的项目</Info7>
+        <Info8>没有文件被选中</Info8>
+        <Info9>请检查您输入的路径</Info9>
+        <Info10>请将图纸文件添加到清理列表</Info10>
+        <Info11>其他工具</Info11>
+        <Info12>未清理</Info12>
+        <Info13>扫描完成，未保存</Info13>
+        <Info14>清理中</Info14>
+        <Info15>选</Info15>
+        <Info16>删除所有文件</Info16>
+        <Info17>导出结果</Info17>
+        <Info18>找到DGN数据</Info18>
+        <Info19>外部参照状态</Info19>
+        <Info20>清理完成</Info20>
+        <Info21>清理取消，某些项目可能未被清理</Info21>
+        <Info22>批量清理</Info22>
+        <Info23>批量清理设置</Info23>
+        <Info24>图纸清理设置</Info24>
+        <Info25>外部参照列表</Info25>
+        <Info26>关于</Info26>
+        <Info27>使用DGN数据发现的外部参照</Info27>
+        <Info28>外部参照</Info28>
+        <Info29>总计</Info29>
+        <Info30>已清理</Info30>
+        <Info31>跳过</Info31>
+        <Info32>失败</Info32>
+        <Info33>上次添加</Info33>
+        <Info34>删除</Info34>
+        <Info35>添加</Info35>
+        <Info36>此路径下未找到设置文件</Info36>
+        <Info37>错误：文件名应该是</Info37>
+        <Info38>所选文件夹不存在</Info38>
+        <Info39>后缀文字中发现无效字符！！ &#xD;这些字符被禁止使用</Info39>
+        <Info40>当前版本</Info40>
+        <Info41>移除</Info41>
+        <Info42>全部移除</Info42>
+        <Info43>导出结果</Info43>
+        <Info44>获取版本时出错</Info44>
+        <Info45>未扫描，“从不清理外部参照”选项被选中</Info45>
+        <Info46>取消</Info46>
+        <Info47>在外部参照中找不到DGN数据</Info47>
+        <Info48>已取消清理外部参照</Info48>
+        <Info49>按Esc键取消</Info49>
+        <Info50>清理项目</Info50>
+        <Info51>清除状态</Info51>
+        <Info52>删除所有已清理文件</Info52>
+        <Info53>删除所有清理失败文件</Info53>
+        <Info54>显示文件信息</Info54>
+        <Info55>帮助</Info55>
+        <Info56>语言已更改，再次运行命令以应用更改</Info56>
+        <Info57>文件</Info57>
+        <Info58>图纸</Info58>
+        <Info59>发现</Info59>
+        <Info60>从</Info60>
+        <Info61>文件夹</Info61>
+        <Info62>文件夹</Info62>
+        <Info63>成功</Info63>
+        <Info64>文件是只读的</Info64>
+        <Info65>图形文件无效，尝试检查并修复文件</Info65>
+        <Info66>检查文件版本</Info66>
+        <Info67>该图形文件中发现外部参照 &#xD; 是否扫描并清理外部参照中的DGN数据？</Info67>
+        <Info68>未找到</Info68>
+        <Info69>扫描</Info69>
+        <Info70>加载所需的AEC文件.. [这是一次性过程]</Info70>
+        <Info71>检查并修复功能仅支持AutoCAD 2015及更高版本</Info71>
+        <Info72>重新加载外部参照以更新图形</Info72>
+        <Info73>模型空间</Info73>
+        <Info74>图纸空间</Info74>
+        <Info75>更改系统变量</Info75>
+        <Info76>请选择一个文件夹来备份文件，替换选项需要一个文件夹位置来备份图纸</Info76>
+    </BatchInfoTexts>
+    <DialogInfo>
+        <!-- 
+	Batch Purge Button,Radiobutton,Combox text and tooltip. 
+	Do not add content for tooltip and text attribute if the content is already empty 
+	add this for Line break, without quotes '&#xD;' 
+	-->
+        <!-- Buttons -->
+        <btnSelectFiles text="选择文件" tooltip="点击添加图纸文件"></btnSelectFiles>
+        <btnSelectFolder text="选择文件夹" tooltip="单击以从文件夹添加图纸文件"></btnSelectFolder>
+        <btnPurge text="清理" tooltip="点击开始清理"></btnPurge>
+        <btnCancel text="取消" tooltip="取消下一个图纸/文件夹"></btnCancel>
+        <btnClose text="关闭" tooltip="关闭此窗口[按ESC键]"></btnClose>
+        <btnSelectAll text="全选" tooltip="选择所有项目"></btnSelectAll>
+        <btnClearAll text="全部清理" tooltip="清理所有选定项目"></btnClearAll>
+        <btnSuccessColor text="高亮颜色：清理成功" tooltip="单击选择清理成功时文件列表的背景色"></btnSuccessColor>
+        <btnFailedColor text="高亮颜色：清理失败/错误" tooltip="单击选择清理失败时文件列表的背景色"></btnFailedColor>
+        <btnResetColor text="重置颜色设置" tooltip="单击重置文件列表的背景色为默认值"></btnResetColor>
+        <btnStngFile text="" tooltip="单击以更改设置文件位置"></btnStngFile>
+        <btnSaveFolder text="" tooltip="单击以选择要保存的文件夹"></btnSaveFolder>
+        <btnBackupFolder text="..." tooltip="单击以选择备份位置"></btnBackupFolder>
+        <btnSearchFolder text="" tooltip="搜索左侧文本窗口中的文件夹路径"></btnSearchFolder>
+        <btnShowPurgeInfo text="" tooltip="点击显示清理结果"></btnShowPurgeInfo>
+        <btnRemoveAll text="" tooltip="删除所有选择的文件以进行清除"></btnRemoveAll>
+        <btnAddXrefs text="添加外部参照到清除列表" tooltip="单击以将外部参照添加到清除列表"></btnAddXrefs>
+        <!-- Radio Buttons -->
+        <rdXrefAlwaysPurge text="总是清理" tooltip="始终清理外部参照"></rdXrefAlwaysPurge>
+        <rdXrefPromptPurge text="提示清理" tooltip="清理外部参照前询问我"></rdXrefPromptPurge>
+        <rdXrefNeverPurge text="不要清理" tooltip="不对外部参照进行清理"></rdXrefNeverPurge>
+        <rdDGNFoundStatusBar text="在状态栏显示" tooltip="在状态栏显示DGN数据计数"></rdDGNFoundStatusBar>
+        <rdDGNFoundInfoCenter text="在信息中心显示" tooltip="在信息中心显示DGN数据计数"></rdDGNFoundInfoCenter>
+        <rdDGNFoundCommandLine text="在命令行显示" tooltip="在命令行显示DGN数据计数"></rdDGNFoundCommandLine>
+        <!-- Check box -->
+        <chkShowProgressInWindow text="在新窗口中显示清理进度" tooltip="选择在新窗口中显示清理进度"></chkShowProgressInWindow>
+        <chkShowProgressInStatus text="在状态栏中显示清理进度" tooltip="选择在AutoCAD状态栏中显示清理进度"></chkShowProgressInStatus>
+        <chkShowTextWindow text="清理完成后显示AutoCAD文本窗口" tooltip="清理完成后显示AutoCAD文本窗口"></chkShowTextWindow>
+        <chkShowDwgPurgeRsltsSlctd text="仅显示所选项目的清理结果" tooltip="清理后显示所选项目的清理结果"></chkShowDwgPurgeRsltsSlctd>
+        <chkScanforDGNonStart text="打开图形时扫描DGN数据" tooltip="选择扫描DGN数据打印时的绘图"></chkScanforDGNonStart>
+        <chkApplyExtraTools text="启用/禁用其他工具" tooltip="选择启用其他工具"></chkApplyExtraTools>
+        <chkZoomExtent text="放大到该范围" tooltip="选择设置缩放范围"></chkZoomExtent>
+        <chkChangeSpace text="将工作环境更改为" tooltip="勾选切换工作环境"></chkChangeSpace>
+        <chkChangeUnits text="将图形单位更改为" tooltip="勾选更改图形单位"></chkChangeUnits>
+        <chkLayer text="指定当前图层为0层" tooltip="勾选后将当前图层更改为0层"></chkLayer>
+        <chkChangeSysVar text="更改系统变量" tooltip="勾选后更改下面列出的系统变量"></chkChangeSysVar>
+        <chkDisableBackup text="在使用“替换/覆盖”选项时备份文件" tooltip="勾选以开启文件备份"></chkDisableBackup>
+        <chkIndexCtl text="启用图层和空间索引系统变量(INDEXCTL)检查" tooltip="勾选后启用INDEXCTL系统变量检查"></chkIndexCtl>
+        <chkDeleteFiles text="删除其他文件" tooltip="删除其他文件，如bak，err，plot.log等"></chkDeleteFiles>
+        <cmbVersion text="" tooltip="选择AutoCAD版本"></cmbVersion>
+        <!-- Text box -->
+        <txtbxSearchPath text="复制/粘贴文件夹路径" tooltip="复制并粘贴文件夹路径，然后按Enter键"></txtbxSearchPath>
+        <txtbxSuffix text="" tooltip="清理文件名后缀"></txtbxSuffix>
+        <!-- Label -->
+        <lblAddXrefs text="注意：添加外部参照时，当前清理文件列表将被清空" tooltip="将只添加有效的外部参照"></lblAddXrefs>
+        <lblStngFile text="设置文件位置" tooltip="单击打开设置文件位置"></lblStngFile>
+        <lblSuffix text="添加后缀：" tooltip="输入后缀文字"></lblSuffix>
+        <lblVersion text="将文件另存为：" tooltip="选择文件版本"></lblVersion>
+        <lblWarning text="警告：禁用备份以启用访问“关于”选项卡" tooltip="建议启用备份或手动备份"></lblWarning>
+        <!-- Group Box -->
+        <grpSavePurge text="保存和清除选项" tooltip=""></grpSavePurge>
+        <grpPurgeItems text="选择要清理的项目" tooltip=""></grpPurgeItems>
+        <grpGenOptions text="一般选项" tooltip=""></grpGenOptions>
+        <grpXrefOptions text="外部参照清理选项" tooltip=""></grpXrefOptions>
+        <grpPrgrsRslts text="清理进度和结果" tooltip=""></grpPrgrsRslts>
+        <grpScanDGNMsg text="如果找到任何DGN数据，您要在哪里看到消息？" tooltip=""></grpScanDGNMsg>
+    </DialogInfo>
+</AVVADWGPurge>

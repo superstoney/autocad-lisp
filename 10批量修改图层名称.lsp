@@ -1,3 +1,24 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; 程序名称: Change Layers From CSV
+;;; 功能说明: 通过CSV文件批量修改图层名称
+;;; 作者: superstoney
+;;; 创建日期: 2025-04-23
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; 显示程序信息的函数
+(defun show-program-info ( / )
+  (princ "\n==================================")
+  (princ "\n    Change Layers From CSV v1.0")
+  (princ "\n----------------------------------")
+  (princ "\n命令名: ChangeLayersFromCSV")
+  (princ "\n功能: 通过CSV文件批量修改图层名称")
+  (princ "\n==================================\n")
+  (princ)
+)
+
+;; 程序加载时自动执行显示信息
+(show-program-info)
+
 (defun c:ChangeLayersFromCSV (/ csvFile file line lst oldLayer newLayer ss doc layers layerObj result)
   (vl-load-com)
   (setq doc (vla-get-activedocument (vlax-get-acad-object)))
@@ -154,4 +175,37 @@
     )
   )
   (reverse lst)
+)
+;; Add this function to check if layer can be safely deleted
+(defun is-layer-removable (layer-name / ss)
+  (and
+    ;; Check if any objects directly use this layer
+    (not (ssget "_X" (list (cons 8 layer-name))))
+    ;; Add additional checks here if needed
+    t
+  )
+)
+
+;; Replace the layer deletion part in your original code with this:
+;; In the "目标图层已存在 → 合并" section:
+(if (not (member (strcase oldLayer) (mapcar 'strcase *system-layers*)))
+  (progn
+    (setq layerObj (vl-catch-all-apply 'vla-item (list layers oldLayer)))
+    (if (and 
+          (not (vl-catch-all-error-p layerObj)) 
+          (vlax-write-enabled-p layerObj)
+          (is-layer-removable oldLayer)
+        )
+      (progn
+        (setq result (vl-catch-all-apply 'vla-delete (list layerObj)))
+        (if (vl-catch-all-error-p result)
+          (princ (strcat "\n删除失败: " 
+            "图层可能被其他对象引用，将保留但不含对象。"))
+          (princ "\n旧图层已删除")
+        )
+      )
+      (princ "\n图层不可删除（只读、系统依赖或被引用）")
+    )
+  )
+  (princ "\n跳过系统图层删除")
 )

@@ -1,0 +1,7 @@
+
+作用：PDF导入时，预先读取PDF总页数。
+
+使用netload 加载Countpdfpages.dll （适用于CAD 版本2013+）文件
+注意事项
+1、itextsharp.dll文件不能移动，如果移动位置都必须和Countpdfpages.dll在一个文件夹下。
+

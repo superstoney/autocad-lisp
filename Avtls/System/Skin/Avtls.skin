@@ -1,0 +1,33 @@
+(setq 项目 ':toggle)
+(setq 群组 ':toggle)
+
+(setq 取消 "cancel_button;")
+(setq 管理 '(:OK_BUTTON (LABEL "管理") (KEY "man")))
+(setq 上页 '(:BUTTON (LABEL "上页&<") (KEY "previous")))
+(setq 下页 '(:BUTTON (LABEL "&>下页") (KEY "next")))
+
+(setq 方块 '(:COLUMN))
+
+(setq 分隔 '(:IMAGE (COLOR RED) (WIDTH 0.2)))
+(setq 间隔 "spa;")
+(setq 自定 '("spa" (:IMAGE (COLOR RED) (HEIGHT 0.2))))
+
+(setq 大皮肤 '(:COLUMN
+	       (:ROW 固定 分隔 活动)
+	       (:ROW
+		 (alignment left)
+		 (fixed_width true)
+		(:text (label "【A维制造】工程造价专用版"))
+		 取消
+		 管理
+		 上页
+		 下页
+	       )
+	      )
+)
+(setq 小皮肤 '(:COLUMN (:ROW 取消) 固定))
+(setq 固定个数 1)
+(setq 活动个数 4)
+(setq 间距 1)
+
+(setq 皮肤信息 '("作者：飞诗寻梦" "修正：A维制造" "QQ号：84764744" "寄语：一点浩然气，" "      千里快哉风！"))
